@@ -48,10 +48,10 @@ if __name__ == "__main__":
     print(f"Train samples: {len(train_data)}, Test samples: {len(test_data)}\n")
     
     # Configure a TPESampler: seeded, allow multivariate modeling and start with several random trials for robustness
-    sampler = TPESampler(seed=42, n_startup_trials=10, multivariate=True)
+    sampler = TPESampler(seed=42, n_startup_trials=8, multivariate=True)
     pruner = MedianPruner()
     study = optuna.create_study(direction="maximize", sampler=sampler, pruner=pruner)
-    study.optimize(objective, n_trials=50, show_progress_bar=True)
+    study.optimize(objective, n_trials=30, show_progress_bar=True)
     
     print("\n=== Best Trial ===")
     print(f"Best accuracy: {study.best_value:.4f}")
