@@ -1,0 +1,15 @@
+{
+  "train_accuracy": 0.4049425287356322,
+  "test_accuracy": 0.35454545454545455,
+  "best_bovw_params": {
+    "codebook_size": 200,
+    "detector_type": "SIFT",
+    "dense_sift": true,
+    "sift_step": 10,
+    "sift_scales": 2,
+    "use_scaler": true
+  },
+  "best_classifier_type": "logreg",
+  "best_classifier_params": {},
+  "datetime": "2025-12-04T14:44:38.227797"
+}
