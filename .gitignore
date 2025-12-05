@@ -1,0 +1,5 @@
+/.venv
+**/__pycache__/
+Week*/**/__pycache__/
+*.pyc   ´
+.DS_Store

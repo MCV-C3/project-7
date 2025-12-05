@@ -1,17 +1,25 @@
 import cv2
 import numpy as np
-from sklearn.cluster import KMeans, MiniBatchKMeans
+from sklearn.cluster import MiniBatchKMeans
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import os
-import glob
+from typing import Tuple, Optional, List
 
-
-from typing import *
-
-class BOVW():
-    
-    def __init__(self, detector_type="AKAZE", codebook_size:int=50, detector_kwargs:dict={}, codebook_kwargs:dict={}):
-
+class BOVW:
+    def __init__(self, detector_type="AKAZE", codebook_size=50, dense_sift=False, 
+                 sift_step=10, sift_scales=1, use_scaler=False, 
+                 detector_kwargs=None, codebook_kwargs=None):
+        self.detector_type = detector_type
+        self.codebook_size = codebook_size
+        self.dense_sift = dense_sift
+        self.sift_step = sift_step
+        self.sift_scales = sift_scales
+        self.use_scaler = use_scaler
+        
+        detector_kwargs = detector_kwargs or {}
+        codebook_kwargs = codebook_kwargs or {}
+        
         if detector_type == 'SIFT':
             self.detector = cv2.SIFT_create(**detector_kwargs)
         elif detector_type == 'AKAZE':
@@ -21,58 +29,84 @@ class BOVW():
         else:
             raise ValueError("Detector type must be 'SIFT', 'SURF', or 'ORB'")
         
-        self.codebook_size = codebook_size
         self.codebook_algo = MiniBatchKMeans(n_clusters=self.codebook_size, **codebook_kwargs)
-        
-               
-    ## Modify this function in order to be able to create a dense sift
-    def _extract_features(self, image: Literal["H", "W", "C"]) -> Tuple:
+        self.scaler = StandardScaler() if use_scaler else None
+    
+    def _extract_dense_sift(self, image: np.ndarray) -> Tuple[List, Optional[np.ndarray]]:
+        if self.detector_type != 'SIFT':
+            raise ValueError("Dense SIFT only works with SIFT detector")
+        # Ensure we operate on a grayscale image
+        if image.ndim == 3 and image.shape[2] == 3:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = image.copy()
 
+        all_descriptors = []
+        all_keypoints = []
+
+        for scale_idx in range(self.sift_scales):
+            scale_factor = 2 ** scale_idx
+            # Downscale the image for this pyramid level
+            scaled_img = cv2.resize(gray, None, fx=1/scale_factor, fy=1/scale_factor, interpolation=cv2.INTER_LINEAR)
+
+            h, w = scaled_img.shape[:2]
+            # keypoints for this scale (in coordinates of scaled_img)
+            kp_scale = []
+            for y in range(0, h, self.sift_step):
+                for x in range(0, w, self.sift_step):
+                    kp = cv2.KeyPoint(float(x), float(y), float(self.sift_step))
+                    kp_scale.append(kp)
+
+            if not kp_scale:
+                continue
+
+            _, descriptors = self.detector.compute(scaled_img, kp_scale)
+            if descriptors is not None and len(descriptors) > 0:
+                all_descriptors.append(descriptors)
+                # store keypoints mapped back to original image coordinates
+                for kp in kp_scale:
+                    orig_x = kp.pt[0] * scale_factor
+                    orig_y = kp.pt[1] * scale_factor
+                    orig_size = kp.size * scale_factor
+                    all_keypoints.append(cv2.KeyPoint(float(orig_x), float(orig_y), float(orig_size)))
+
+        if all_descriptors:
+            return all_keypoints, np.vstack(all_descriptors)
+        return [], None
+    
+    def _extract_features(self, image: np.ndarray) -> Tuple[List, Optional[np.ndarray]]:
+        if self.dense_sift:
+            return self._extract_dense_sift(image)
         return self.detector.detectAndCompute(image, None)
     
-    
-    def _update_fit_codebook(self, descriptors: Literal["N", "T", "d"])-> Tuple[Type[MiniBatchKMeans],
-                                                                               Literal["codebook_size", "d"]]:
-        
+    def _update_fit_codebook(self, descriptors: List[np.ndarray]) -> Tuple[MiniBatchKMeans, np.ndarray]:
         all_descriptors = np.vstack(descriptors)
-
-        self.codebook_algo = self.codebook_algo.partial_fit(X=all_descriptors)
-
+        
+        if self.scaler is not None:
+            all_descriptors = self.scaler.fit_transform(all_descriptors)
+        
+        self.codebook_algo.fit(all_descriptors)
         return self.codebook_algo, self.codebook_algo.cluster_centers_
     
-    def _compute_codebook_descriptor(self, descriptors: Literal["1 T d"], kmeans: Type[KMeans]) -> np.ndarray:
-
+    def _compute_codebook_descriptor(self, descriptors: np.ndarray, kmeans=None) -> np.ndarray:
+        if kmeans is None:
+            kmeans = self.codebook_algo
+        
+        if self.scaler is not None:
+            descriptors = self.scaler.transform(descriptors)
+        
         visual_words = kmeans.predict(descriptors)
+        histogram = np.zeros(kmeans.n_clusters)
         
-        
-        # Create a histogram of visual words
-        codebook_descriptor = np.zeros(kmeans.n_clusters)
         for label in visual_words:
-            codebook_descriptor[label] += 1
+            histogram[label] += 1
         
-        # Normalize the histogram (optional)
-        codebook_descriptor = codebook_descriptor / np.linalg.norm(codebook_descriptor)
-        
-        return codebook_descriptor       
-    
+        histogram = histogram / (np.linalg.norm(histogram) + 1e-6)
+        return histogram
 
-
-
-
-def visualize_bow_histogram(histogram, image_index, output_folder="./test_example.jpg"):
-    """
-    Visualizes the Bag of Visual Words histogram for a specific image and saves the plot to the output folder.
-    
-    Args:
-        histogram (np.array): BoVW histogram.
-        cluster_centers (np.array): Cluster centers (visual words).
-        image_index (int): Index of the image for reference.
-        output_folder (str): Folder where the plot will be saved.
-    """
-    # Ensure the output folder exists
+def visualize_bow_histogram(histogram, image_index, output_folder="./histograms"):
     os.makedirs(output_folder, exist_ok=True)
     
-    # Create the plot
     plt.figure(figsize=(10, 5))
     plt.bar(range(len(histogram)), histogram)
     plt.title(f"BoVW Histogram for Image {image_index}")
@@ -80,12 +114,9 @@ def visualize_bow_histogram(histogram, image_index, output_folder="./test_exampl
     plt.ylabel("Frequency")
     plt.xticks(range(len(histogram)))
     
-    # Save the plot to the output folder
     plot_path = os.path.join(output_folder, f"bovw_histogram_image_{image_index}.png")
     plt.savefig(plot_path)
-    
-    # Optionally, close the plot to free up memory
     plt.close()
-
+    
     print(f"Plot saved to: {plot_path}")
 
