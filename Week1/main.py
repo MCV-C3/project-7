@@ -2,9 +2,10 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from bovw import BOVW
 from utils import load_dataset, extract_descriptors, extract_bovw_histograms
+import os
 
 def train_evaluate(train_hist, train_labels, val_hist, val_labels, classifier_type="logreg", **kwargs):
     if classifier_type == "logreg":
@@ -23,10 +24,12 @@ def train_evaluate(train_hist, train_labels, val_hist, val_labels, classifier_ty
     return train_acc, val_acc, clf
 
 def cross_validate(dataset, bovw_params, classifier_params, n_splits=5, classifier_type="logreg"):
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+    # Extraer labels para el split estratificado
+    labels = [label for _, label in dataset]
+
+    kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     fold_results = []
-    
-    for fold_idx, (train_idx, val_idx) in enumerate(kf.split(dataset)):
+    for fold_idx, (train_idx, val_idx) in enumerate(kf.split(dataset, labels)):
         print(f"\nFold {fold_idx + 1}/{n_splits}")
         
         train_set = [dataset[i] for i in train_idx]
@@ -70,9 +73,14 @@ def test_final(train_set, test_set, bovw_params, classifier_params, classifier_t
     return train_acc, test_acc, bovw, clf
 
 if __name__ == "__main__":
-    train_data = load_dataset("../data/MIT_split/train")
-    test_data = load_dataset("../data/MIT_split/test")
-    
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATA_DIR = os.path.join(BASE_DIR, "..", "data", "MIT_split")
+
+    train_data = load_dataset(os.path.join(DATA_DIR, "train"))
+    test_data  = load_dataset(os.path.join(DATA_DIR, "test"))
+    # train_data = load_dataset(r"C:\Users\adria\Desktop\Adri\Proyectos\CVM\project-7\data\MIT_split\train")
+    # test_data  = load_dataset(r"C:\Users\adria\Desktop\Adri\Proyectos\CVM\project-7\data\MIT_split\test")
+    classifier_types = ['logreg', 'svm_linear', 'svm_rbf']
     print(f"Train samples: {len(train_data)}, Test samples: {len(test_data)}")
     
     bovw_params = {
@@ -84,15 +92,17 @@ if __name__ == "__main__":
     }
     
     classifier_params = {}
-    
-    print("\n=== Cross-Validation ===")
-    mean_acc, std_acc = cross_validate(train_data, bovw_params, classifier_params, 
-                                       n_splits=5, classifier_type="logreg")
-    print(f"\nMean CV Accuracy: {mean_acc:.4f} +/- {std_acc:.4f}")
-    
-    print("\n=== Final Test ===")
-    train_acc, test_acc, bovw, clf = test_final(train_data, test_data, 
-                                                 bovw_params, classifier_params, 
-                                                 classifier_type="logreg")
-    print(f"Train Accuracy: {train_acc:.4f}")
-    print(f"Test Accuracy: {test_acc:.4f}")
+    for classifier_type in classifier_types:
+        print("\n=== Cross-Validation ===")
+        
+        print(f"\n=== CLASSIFIER : {classifier_type} ===")
+        mean_acc, std_acc = cross_validate(train_data, bovw_params, classifier_params, 
+                                        n_splits=5, classifier_type=classifier_type)
+        print(f"\nMean CV Accuracy: {mean_acc:.4f} +/- {std_acc:.4f}")
+        
+        print("\n=== Final Test ===")
+        train_acc, test_acc, bovw, clf = test_final(train_data, test_data, 
+                                                    bovw_params, classifier_params, 
+                                                    classifier_type=classifier_type)
+        print(f"Train Accuracy: {train_acc:.4f}")
+        print(f"Test Accuracy: {test_acc:.4f}")
