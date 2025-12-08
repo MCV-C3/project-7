@@ -42,6 +42,10 @@ def extract_descriptors(bovw, dataset: List[Tuple[np.ndarray, int]],
     
     return all_descriptors, all_labels
 
-def extract_bovw_histograms(bovw, descriptors_list: List[np.ndarray]) -> np.ndarray:
-    return np.array([bovw._compute_codebook_descriptor(d, bovw.codebook_algo) for d in descriptors_list])
-
+def extract_bovw_histograms(bovw, descriptors_list: List[np.ndarray], fit_pca=False) -> np.ndarray:
+    histograms = np.array([bovw._compute_codebook_descriptor(d, bovw.codebook_algo) for d in descriptors_list])
+    # fit pca on training histograms
+    if fit_pca:
+        return bovw._fit_transform_pca(histograms)
+    # only apply transform on test set
+    return bovw.transform_pca(histograms)

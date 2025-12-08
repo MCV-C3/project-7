@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import os
 from typing import Tuple, Optional, List
@@ -9,13 +10,15 @@ from typing import Tuple, Optional, List
 class BOVW:
     def __init__(self, detector_type="AKAZE", codebook_size=50, dense_sift=False, 
                  sift_step=10, sift_scales=1, use_scaler=False, 
-                 detector_kwargs=None, codebook_kwargs=None):
+                 detector_kwargs=None, codebook_kwargs=None, pca_components=None):
         self.detector_type = detector_type
         self.codebook_size = codebook_size
         self.dense_sift = dense_sift
         self.sift_step = sift_step
         self.sift_scales = sift_scales
         self.use_scaler = use_scaler
+        self.pca_components = pca_components
+        self.pca = PCA(n_components=pca_components) if pca_components is not None else None
         
         detector_kwargs = detector_kwargs or {}
         codebook_kwargs = codebook_kwargs or {}
@@ -103,6 +106,17 @@ class BOVW:
         
         histogram = histogram / (np.linalg.norm(histogram) + 1e-6)
         return histogram
+    
+    def _fit_transform_pca(self, histograms):
+        if self.pca is None:
+            return histograms
+        self.pca.fit(histograms)
+        return self.pca.transform(histograms)
+    
+    def transform_pca(self, histograms):
+        if self.pca is None:
+            return histograms
+        return self.pca.transform(histograms)
 
 def visualize_bow_histogram(histogram, image_index, output_folder="./histograms"):
     os.makedirs(output_folder, exist_ok=True)

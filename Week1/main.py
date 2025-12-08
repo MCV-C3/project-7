@@ -39,10 +39,10 @@ def cross_validate(dataset, bovw_params, classifier_params, n_splits=5, classifi
         train_desc, train_labels = extract_descriptors(bovw, train_set, "Extracting train descriptors")
         
         bovw._update_fit_codebook(train_desc)
-        train_hist = extract_bovw_histograms(bovw, train_desc)
+        train_hist = extract_bovw_histograms(bovw, train_desc, fit_pca=True)
         
         val_desc, val_labels = extract_descriptors(bovw, val_set, "Extracting val descriptors")
-        val_hist = extract_bovw_histograms(bovw, val_desc)
+        val_hist = extract_bovw_histograms(bovw, val_desc, fit_pca=False)
         
         train_acc, val_acc, _ = train_evaluate(train_hist, train_labels, 
                                                val_hist, val_labels, 
@@ -61,10 +61,10 @@ def test_final(train_set, test_set, bovw_params, classifier_params, classifier_t
     train_desc, train_labels = extract_descriptors(bovw, train_set, "Extracting train descriptors")
     
     bovw._update_fit_codebook(train_desc)
-    train_hist = extract_bovw_histograms(bovw, train_desc)
+    train_hist = extract_bovw_histograms(bovw, train_desc, fit_pca=True)
     
     test_desc, test_labels = extract_descriptors(bovw, test_set, "Extracting test descriptors")
-    test_hist = extract_bovw_histograms(bovw, test_desc)
+    test_hist = extract_bovw_histograms(bovw, test_desc, fit_pca=False)
     
     train_acc, test_acc, clf = train_evaluate(train_hist, train_labels,
                                               test_hist, test_labels,
@@ -78,8 +78,6 @@ if __name__ == "__main__":
 
     train_data = load_dataset(os.path.join(DATA_DIR, "train"))
     test_data  = load_dataset(os.path.join(DATA_DIR, "test"))
-    # train_data = load_dataset(r"C:\Users\adria\Desktop\Adri\Proyectos\CVM\project-7\data\MIT_split\train")
-    # test_data  = load_dataset(r"C:\Users\adria\Desktop\Adri\Proyectos\CVM\project-7\data\MIT_split\test")
     classifier_types = ['logreg', 'svm_linear', 'svm_rbf']
     print(f"Train samples: {len(train_data)}, Test samples: {len(test_data)}")
     
@@ -88,7 +86,8 @@ if __name__ == "__main__":
         "codebook_size": 50,
         "dense_sift": False,
         "sift_step": 10,
-        "sift_scales": 1
+        "sift_scales": 1,
+        "pca_components": 0.90, # Can specify number of components (int) or retained variance (float)
     }
     
     classifier_params = {}
