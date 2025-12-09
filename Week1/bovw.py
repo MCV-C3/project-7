@@ -118,6 +118,52 @@ class BOVW:
             return histograms
         return self.pca.transform(histograms)
 
+    def compute_spatial_pyramid(self, image: np.ndarray, descriptors: np.ndarray, keypoints: list, levels=2):
+        if descriptors is None or len(descriptors) == 0:
+            total_bins = self.codebook_size * (sum([4**i for i in range(levels + 1)]))
+            return np.zeros(total_bins)
+
+        h, w = image.shape[:2]
+        
+        if self.scaler is not None:
+            descriptors = self.scaler.transform(descriptors)
+        visual_words = self.codebook_algo.predict(descriptors)
+        
+        pyramid_histograms = []
+        
+        for l in range(levels + 1):
+            n_cells = 2**l
+            
+            x_step = w / n_cells
+            y_step = h / n_cells
+            
+            for i in range(n_cells):
+                for j in range(n_cells):
+                    x_start, x_end = i * x_step, (i + 1) * x_step
+                    y_start, y_end = j * y_step, (j + 1) * y_step
+                    
+                    mask = []
+                    for kp in keypoints:
+                        kx, ky = kp.pt
+                        in_cell = (x_start <= kx < x_end) and (y_start <= ky < y_end)
+                        mask.append(in_cell)
+                    
+                    cell_words = visual_words[np.array(mask)]
+                    
+                    hist = np.zeros(self.codebook_size)
+                    for label in cell_words:
+                        hist[label] += 1
+                    
+                    norm = np.linalg.norm(hist)
+                    if norm > 1e-6:
+                        hist /= norm
+                        
+                    pyramid_histograms.append(hist)
+        
+        final_feature = np.concatenate(pyramid_histograms)
+        final_feature /= (np.linalg.norm(final_feature) + 1e-6)
+        return final_feature
+
 def visualize_bow_histogram(histogram, image_index, output_folder="./histograms"):
     os.makedirs(output_folder, exist_ok=True)
     

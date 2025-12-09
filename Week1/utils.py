@@ -49,3 +49,17 @@ def extract_bovw_histograms(bovw, descriptors_list: List[np.ndarray], fit_pca=Fa
         return bovw._fit_transform_pca(histograms)
     # only apply transform on test set
     return bovw.transform_pca(histograms)
+
+def extract_spatial_pyramid_histograms(bovw, dataset, levels=2, desc="Extracting SPM"):
+    histograms = []
+    labels = []
+    
+    for image, label in tqdm.tqdm(dataset, desc=desc):
+        kps, descs = bovw._extract_features(image)
+        
+        if descs is not None:
+            spm_hist = bovw.compute_spatial_pyramid(image, descs, kps, levels=levels)
+            histograms.append(spm_hist)
+            labels.append(label)
+            
+    return np.array(histograms), np.array(labels)
