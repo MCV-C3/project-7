@@ -78,30 +78,30 @@ if __name__ == "__main__":
 
     train_data = load_dataset(os.path.join(DATA_DIR, "train"))
     test_data  = load_dataset(os.path.join(DATA_DIR, "test"))
-    classifier_types = ['logreg', 'svm_linear', 'svm_rbf']
+    classifier_type = 'logreg'
+
     print(f"Train samples: {len(train_data)}, Test samples: {len(test_data)}")
-    
+
     bovw_params = {
-        "detector_type": "AKAZE",
-        "codebook_size": 50,
-        "dense_sift": False,
+        "detector_type": "SIFT",
+        "codebook_size": 200,
+        "dense_sift": True,
         "sift_step": 10,
-        "sift_scales": 1,
+        "sift_scales": 2,
         "pca_components": 0.90, # Can specify number of components (int) or retained variance (float)
     }
-    
+
     classifier_params = {}
-    for classifier_type in classifier_types:
-        print("\n=== Cross-Validation ===")
-        
-        print(f"\n=== CLASSIFIER : {classifier_type} ===")
-        mean_acc, std_acc = cross_validate(train_data, bovw_params, classifier_params, 
-                                        n_splits=5, classifier_type=classifier_type)
-        print(f"\nMean CV Accuracy: {mean_acc:.4f} +/- {std_acc:.4f}")
-        
-        print("\n=== Final Test ===")
-        train_acc, test_acc, bovw, clf = test_final(train_data, test_data, 
-                                                    bovw_params, classifier_params, 
-                                                    classifier_type=classifier_type)
-        print(f"Train Accuracy: {train_acc:.4f}")
-        print(f"Test Accuracy: {test_acc:.4f}")
+
+    print("\n=== Cross-Validation ===")
+    print(f"\n=== CLASSIFIER : {classifier_type} ===")
+    mean_acc, std_acc = cross_validate(train_data, bovw_params, classifier_params,
+                                       n_splits=5, classifier_type=classifier_type)
+    print(f"\nMean CV Accuracy: {mean_acc:.4f} +/- {std_acc:.4f}")
+
+    print("\n=== Final Test ===")
+    train_acc, test_acc, bovw, clf = test_final(train_data, test_data,
+                                                bovw_params, classifier_params,
+                                                classifier_type=classifier_type)
+    print(f"Train Accuracy: {train_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")
