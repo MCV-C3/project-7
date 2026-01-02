@@ -55,7 +55,8 @@ class WraperModel(nn.Module):
         super(WraperModel, self).__init__()
 
         # Load pretrained VGG16 model
-        self.backbone = models.vgg16(weights='IMAGENET1K_V1')
+        self.backbone = models.vgg16(weights=None)
+        self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent28/Week3/vgg16-IMAGENET1K_V1.pth"))
         
         if feature_extraction:
             self.set_parameter_requires_grad(feature_extracting=feature_extraction)

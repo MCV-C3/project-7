@@ -13,6 +13,8 @@ import tqdm
 
 from torchvision.transforms import Compose, ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
 
+import wandb
+import os
 
 # Train function
 def train(model, dataloader, criterion, optimizer, device):
@@ -129,6 +131,21 @@ def plot_computational_graph(model: torch.nn.Module, input_size: tuple, filename
 
 if __name__ == "__main__":
 
+    DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
+    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent28/output'
+    os.makedirs(OUTPUT_PATH, exist_ok=True)
+
+    LEARNING_RATE = 1e-3
+    BATCH_SIZE = 16
+    EPOCHS = 3
+
+    wandb.init(project="C3_Week3_Task1", name="VGG16_Freeze_Baseline", config={
+        "learning_rate": LEARNING_RATE,
+        "batch_size": BATCH_SIZE,
+        "dataset": "MIT_small_train_1",
+        "epochs": EPOCHS
+    })
+
     torch.manual_seed(42)
 
     transformation  = F.Compose([
@@ -137,10 +154,10 @@ if __name__ == "__main__":
                                     F.Resize(size=(224, 224)),
                                 ])
     
-    data_train = ImageFolder("~/data/Master/MIT_split/train", transform=transformation)
-    data_test = ImageFolder("~/data/Master/MIT_split/test", transform=transformation) 
+    data_train = ImageFolder(root=os.path.join(DATASET_ROOT, 'train'), transform=transformation)
+    data_test = ImageFolder(root=os.path.join(DATASET_ROOT, 'test'), transform=transformation)
 
-    train_loader = DataLoader(data_train, batch_size=16, pin_memory=True, shuffle=True, num_workers=8)
+    train_loader = DataLoader(data_train, batch_size=BATCH_SIZE, pin_memory=True, shuffle=True, num_workers=8)
     test_loader = DataLoader(data_test, batch_size=1, pin_memory=True, shuffle=False, num_workers=8)
 
     C, H, W = np.array(data_train[0][0]).shape
@@ -152,8 +169,8 @@ if __name__ == "__main__":
 
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    num_epochs = 3
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    num_epochs = EPOCHS
 
     train_losses, train_accuracies = [], []
     test_losses, test_accuracies = [], []
@@ -170,6 +187,14 @@ if __name__ == "__main__":
         print(f"Epoch {epoch + 1}/{num_epochs} - "
               f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.4f}, "
               f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+
+        wandb.log({
+            "epoch": epoch + 1,
+            "train_loss": train_loss,
+            "train_accuracy": train_accuracy,
+            "test_loss": test_loss,
+            "test_accuracy": test_accuracy,
+        })
         
     torch.save(model.state_dict(), "./saved_model.pt")
 
