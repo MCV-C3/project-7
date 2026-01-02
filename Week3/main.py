@@ -68,7 +68,7 @@ def test(model, dataloader, criterion, device):
     accuracy = correct / total
     return avg_loss, accuracy
 
-def plot_metrics(train_metrics: Dict, test_metrics: Dict, metric_name: str):
+def plot_metrics(train_metrics: Dict, test_metrics: Dict, metric_name: str, OUTPUT_DIR: str = "./"):
     """
     Plots and saves metrics for training and testing.
 
@@ -92,7 +92,7 @@ def plot_metrics(train_metrics: Dict, test_metrics: Dict, metric_name: str):
 
     # Save the plot with the appropriate name
     filename = "loss.png" if metric_name.lower() == "loss" else "metrics.png"
-    plt.savefig(filename)
+    plt.savefig(os.path.join(OUTPUT_DIR, filename))
     print(f"Plot saved as {filename}")
 
     plt.close()  # Close the figure to free memory
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     LEARNING_RATE = 1e-3
     BATCH_SIZE = 16
-    EPOCHS = 3
+    EPOCHS = 10
 
     wandb.init(project="C3_Week3_Task1", name="VGG16_Freeze_Baseline", config={
         "learning_rate": LEARNING_RATE,
@@ -196,8 +196,9 @@ if __name__ == "__main__":
             "test_accuracy": test_accuracy,
         })
         
-    torch.save(model.state_dict(), "./saved_model.pt")
+    model_path = os.path.join(OUTPUT_PATH, "saved_model.pt")
+    torch.save(model.state_dict(), model_path)
 
     # Plot results
-    plot_metrics({"loss": train_losses, "accuracy": train_accuracies}, {"loss": test_losses, "accuracy": test_accuracies}, "loss")
-    plot_metrics({"loss": train_losses, "accuracy": train_accuracies}, {"loss": test_losses, "accuracy": test_accuracies}, "accuracy")
+    plot_metrics({"loss": train_losses, "accuracy": train_accuracies}, {"loss": test_losses, "accuracy": test_accuracies}, "loss", OUTPUT_DIR=OUTPUT_PATH)
+    plot_metrics({"loss": train_losses, "accuracy": train_accuracies}, {"loss": test_losses, "accuracy": test_accuracies}, "accuracy", OUTPUT_DIR=OUTPUT_PATH)

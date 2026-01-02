@@ -11,6 +11,7 @@ module load conda
 conda activate c3
 
 export WANDB_MODE=offline
+export WANDB_DIR=/data/uabmcv2526/mcvstudent28/wandb
 
 cd /home/mcvstudent28/Week3
 
