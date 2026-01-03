@@ -51,22 +51,87 @@ class SimpleModel(nn.Module):
 
 
 class WraperModel(nn.Module):
-    def __init__(self, num_classes: int, feature_extraction: bool=True):
+    def __init__(self, num_classes: int, experiment_mode: str="baseline"):
+        """
+        experiment_mode (str): Experiment configuration:
+            - 'baseline': Frozen VGG16 + Simple linear layer.
+            - 'multilayer': Frozen VGG16 + Hidden layers (more capacity).
+            - 'dropout': Same as multilayer but with Dropout (less overfitting).
+            - 'batchnorm': Adds Batch Normalization for stability.
+            - 'finetune': Unfreezes last convolutional block + Dropout.
+        """
         super(WraperModel, self).__init__()
 
         # Load pretrained VGG16 model
         self.backbone = models.vgg16(weights=None)
         self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent28/Week3/vgg16-IMAGENET1K_V1.pth"))
         
-        if feature_extraction:
-            self.set_parameter_requires_grad(feature_extracting=feature_extraction)
+        # Get the input size of the first layer of the original classifier
+        in_features = self.backbone.classifier[0].in_features 
 
-        # Modify the classifier for the number of classes
-        self.backbone.classifier[-1] = nn.Linear(self.backbone.classifier[-1].in_features, num_classes)
+        # --- FREEZING LOGIC ---
+        if experiment_mode == 'finetune':
+            # Freeze everything first
+            for param in self.backbone.parameters():
+                param.requires_grad = False
+            # UNFREEZE only the last convolutional block (features[24] to [30])
+            for param in self.backbone.features[24:].parameters():
+                param.requires_grad = True
+            print(f"MODEL SETUP: Mode '{experiment_mode}' -> Last conv block UNFROZEN.")
+        else:
+            # Freeze ALL for the rest of the modes
+            for param in self.backbone.parameters():
+                param.requires_grad = False
+            print(f"MODEL SETUP: Mode '{experiment_mode}' -> Backbone completely FROZEN.")
+
+        # --- CLASSIFIER HEAD LOGIC ---
+        if experiment_mode == 'baseline':
+            self.backbone.classifier = nn.Sequential(
+                nn.Linear(in_features, 256),
+                nn.ReLU(),
+                nn.Linear(256, num_classes)
+            )
+
+        elif experiment_mode == 'multilayer':
+            self.backbone.classifier = nn.Sequential(
+                nn.Linear(in_features, 1024),
+                nn.ReLU(),
+                nn.Linear(1024, 256),
+                nn.ReLU(),
+                nn.Linear(256, num_classes)
+            )
+
+        elif experiment_mode == 'dropout' or experiment_mode == 'finetune':
+            self.backbone.classifier = nn.Sequential(
+                nn.Linear(in_features, 1024),
+                nn.ReLU(),
+                nn.Dropout(0.5), # Turns off 50% of neurons
+                nn.Linear(1024, 256),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(256, num_classes)
+            )
+
+        elif experiment_mode == 'batchnorm':
+            self.backbone.classifier = nn.Sequential(
+                nn.Linear(in_features, 1024),
+                nn.BatchNorm1d(1024), # Stabilizes
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(1024, 256),
+                nn.BatchNorm1d(256),
+                nn.ReLU(),
+                nn.Dropout(0.5),
+                nn.Linear(256, num_classes)
+            )
+            
+        else:
+            raise ValueError(f"Mode '{experiment_mode}' not recognized.")
 
     def forward(self, x):
         return self.backbone(x)
     
+
 
     def extract_feature_maps(self, input_image:torch.Tensor):
 
@@ -92,9 +157,6 @@ class WraperModel(nn.Module):
 
         return feature_maps, layer_names
 
-
-
-        
 
     def extract_features_from_hooks(self, x, layers: List[str]):
         """
@@ -133,6 +195,7 @@ class WraperModel(nn.Module):
 
         return outputs
 
+
     def modify_layers(self, modify_fn: Callable[[nn.Module], nn.Module]):
         """
         Modify layers of the model using a provided function.
@@ -149,7 +212,6 @@ class WraperModel(nn.Module):
         if feature_extracting:
             for param in self.backbone.parameters():
                 param.requires_grad = False
-
 
 
     def extract_grad_cam(self, input_image: torch.Tensor, 

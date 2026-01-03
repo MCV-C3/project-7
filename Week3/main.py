@@ -137,9 +137,11 @@ if __name__ == "__main__":
 
     LEARNING_RATE = 1e-3
     BATCH_SIZE = 16
-    EPOCHS = 10
+    EPOCHS = 20
+    CURRENT_MODE = 'batchnorm'  # Options: 'baseline', 'multilayer', 'dropout', 'batchnorm', 'finetune'
 
-    wandb.init(project="C3_Week3_Task1", name="VGG16_Freeze_Baseline", config={
+    wandb.init(project="C3_Week3_Task1", name=f"Exp_{CURRENT_MODE}_v2", config={
+        "mode": CURRENT_MODE,
         "learning_rate": LEARNING_RATE,
         "batch_size": BATCH_SIZE,
         "dataset": "MIT_small_train_1",
@@ -165,11 +167,12 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-    model = WraperModel(num_classes=8, feature_extraction=True)#SimpleModel(input_d=C*H*W, hidden_d=300, output_d=8)
+    model = WraperModel(num_classes=8, experiment_mode=CURRENT_MODE)
 
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    learning_rate = LEARNING_RATE if CURRENT_MODE == 'finetune' else LEARNING_RATE * 10
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     num_epochs = EPOCHS
 
     train_losses, train_accuracies = [], []
