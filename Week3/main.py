@@ -138,9 +138,10 @@ if __name__ == "__main__":
     LEARNING_RATE = 1e-3
     BATCH_SIZE = 16
     EPOCHS = 20
-    CURRENT_MODE = 'batchnorm'  # Options: 'baseline', 'multilayer', 'dropout', 'batchnorm', 'finetune'
+    CURRENT_MODE = 'finetune_progressive'  # Options: 'baseline', 'multilayer', 'dropout', 'batchnorm', 'finetune', 'finetune_progressive'
+    UNFREEZE_EPOCH = 5
 
-    wandb.init(project="C3_Week3_Task1", name=f"Exp_{CURRENT_MODE}_v2", config={
+    wandb.init(project="C3_Week3_Task1", name=f"Exp_{CURRENT_MODE}", config={
         "mode": CURRENT_MODE,
         "learning_rate": LEARNING_RATE,
         "batch_size": BATCH_SIZE,
@@ -171,7 +172,7 @@ if __name__ == "__main__":
 
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
-    learning_rate = LEARNING_RATE if CURRENT_MODE == 'finetune' else LEARNING_RATE * 10
+    learning_rate = LEARNING_RATE * 0.1 if CURRENT_MODE == 'finetune' else LEARNING_RATE
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     num_epochs = EPOCHS
 
@@ -179,6 +180,15 @@ if __name__ == "__main__":
     test_losses, test_accuracies = [], []
     
     for epoch in tqdm.tqdm(range(num_epochs), desc="TRAINING THE MODEL"):
+        if CURRENT_MODE == "finetune_progressive" and epoch == UNFREEZE_EPOCH:
+            for param in model.backbone.layers[-2:].parameters():
+                param.requires_grad = True
+
+            optimizer = optim.Adam(
+                filter(lambda p: p.requires_grad, model.parameters()),
+                lr=LEARNING_RATE * 0.1
+            )
+
         train_loss, train_accuracy = train(model, train_loader, criterion, optimizer, device)
         test_loss, test_accuracy = test(model, test_loader, criterion, device)
 

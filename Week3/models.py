@@ -63,20 +63,29 @@ class WraperModel(nn.Module):
         super(WraperModel, self).__init__()
 
         # Load pretrained VGG16 model
-        self.backbone = models.vgg16(weights=None)
-        self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent28/Week3/vgg16-IMAGENET1K_V1.pth"))
+        self.backbone = models.mnasnet1_0(weights=None)
+        self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent28/Week3/mnasnet1_0-IMAGENET1K_V1.pth"))
         
         # Get the input size of the first layer of the original classifier
-        in_features = self.backbone.classifier[0].in_features 
+        in_features = None
+        for layer in self.backbone.classifier:
+            if isinstance(layer, nn.Linear):
+                in_features = layer.in_features
+                break
+
+        if in_features is None:
+            raise ValueError("No Linear layer found in the backbone classifier")
 
         # --- FREEZING LOGIC ---
         if experiment_mode == 'finetune':
             # Freeze everything first
             for param in self.backbone.parameters():
                 param.requires_grad = False
-            # UNFREEZE only the last convolutional block (features[24] to [30])
-            for param in self.backbone.features[24:].parameters():
-                param.requires_grad = True
+            # Unfreeze the last K feature blocks
+            K = 2
+            for block in self.backbone.layers[-K:]:
+                for param in block.parameters():
+                    param.requires_grad = True
             print(f"MODEL SETUP: Mode '{experiment_mode}' -> Last conv block UNFROZEN.")
         else:
             # Freeze ALL for the rest of the modes
@@ -87,9 +96,7 @@ class WraperModel(nn.Module):
         # --- CLASSIFIER HEAD LOGIC ---
         if experiment_mode == 'baseline':
             self.backbone.classifier = nn.Sequential(
-                nn.Linear(in_features, 256),
-                nn.ReLU(),
-                nn.Linear(256, num_classes)
+                nn.Linear(in_features, num_classes)
             )
 
         elif experiment_mode == 'multilayer':
@@ -101,30 +108,22 @@ class WraperModel(nn.Module):
                 nn.Linear(256, num_classes)
             )
 
-        elif experiment_mode == 'dropout' or experiment_mode == 'finetune':
+        elif experiment_mode == 'dropout' or experiment_mode == 'finetune' or experiment_mode == 'finetune_progressive':
             self.backbone.classifier = nn.Sequential(
-                nn.Linear(in_features, 1024),
-                nn.ReLU(),
-                nn.Dropout(0.5), # Turns off 50% of neurons
-                nn.Linear(1024, 256),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(256, num_classes)
+                nn.Dropout(0.2),
+                nn.Linear(in_features, num_classes)
             )
 
         elif experiment_mode == 'batchnorm':
             self.backbone.classifier = nn.Sequential(
-                nn.Linear(in_features, 1024),
-                nn.BatchNorm1d(1024), # Stabilizes
+                nn.Dropout(0.2),
+                nn.Linear(in_features, 512),
+                nn.BatchNorm1d(512),
                 nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(1024, 256),
-                nn.BatchNorm1d(256),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(256, num_classes)
+                nn.Dropout(0.2),
+                nn.Linear(512, num_classes)
             )
-            
+
         else:
             raise ValueError(f"Mode '{experiment_mode}' not recognized.")
 
@@ -139,7 +138,7 @@ class WraperModel(nn.Module):
         conv_layers = []
         total_conv_layers = 0
 
-        for module in self.backbone.features.children():
+        for module in self.backbone.layers.children():
             if isinstance(module, nn.Conv2d):
                 total_conv_layers += 1
                 conv_weights.append(module.weight)
