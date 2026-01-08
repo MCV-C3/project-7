@@ -226,46 +226,21 @@ class WraperModel(nn.Module):
         return grayscale_cam
 
 
-
-
-
-# Example of usage
-if __name__ == "__main__":
-    torch.manual_seed(42)
-
-    # Load a pretrained model and modify it
-    model = WraperModel(num_classes=8, feature_extraction=False)
-    #model.load_state_dict(torch.load("saved_model.pt"))
-    #model = model
-
-    """
-        features.0
-        features.2
-        features.5
-        features.7
-        features.10
-        features.12
-        features.14
-        features.17
-        features.19
-        features.21
-        features.24
-        features.26
-        features.28
-    """
+def build_transforms(use_flip: bool = False,
+                     use_color: bool = False,
+                     use_geometric: bool = False,
+                     use_translation: bool = False) -> F.Compose:
     transforms = [
-        F.ToImage(),
-        F.ToDtype(torch.float32, scale=True),
-        F.Resize((256, 256)),
-    ]
-
-    USE_FLIP, USE_COLOR, USE_GEOMETRIC, USE_TRANSLATION = False, False, False, False
-
-    if USE_FLIP:
+            F.ToImage(),
+            F.ToDtype(torch.float32, scale=True),
+            F.Resize((256, 256)),
+        ]
+    
+    if use_flip:
         transforms += [
             F.RandomHorizontalFlip(p=0.5)
         ]
-    if USE_COLOR:
+    if use_color:
         transforms += [
             F.ColorJitter(
                 brightness=0.2,   # + - 20%
@@ -274,7 +249,7 @@ if __name__ == "__main__":
                 hue=0.05
             )
         ]
-    if USE_GEOMETRIC:
+    if use_geometric:
         transforms += [
             F.RandomAffine(
                 degrees=10,          # rotation + - 10°
@@ -282,7 +257,7 @@ if __name__ == "__main__":
                 shear=5              # shear + - 5°
             )
         ]
-    if USE_TRANSLATION:
+    if use_translation:
         transforms += [
             F.RandomAffine(
                 degrees=0,           # no rotation
@@ -290,14 +265,27 @@ if __name__ == "__main__":
             )
         ]
 
-    transformation = F.Compose(transforms)
+    return F.Compose(transforms)
+
+
+# Example of usage
+if __name__ == "__main__":
+    torch.manual_seed(42)
+
+    # Load a pretrained model and modify it
+    model = WraperModel(num_classes=8, feature_extraction=False)
+
+    transformation = build_transforms(
+        use_flip=False,
+        use_color=False,
+        use_geometric=False,
+        use_translation=False
+    )
 
 
     # Example GradCAM usage
     dummy_input = Image.open("/home/cboned/data/Master/MIT_split/test/highway/art803.jpg")#torch.randn(1, 3, 224, 224)
     input_image = transformation(dummy_input).unsqueeze(0)
-
-
 
     target_layers = [model.backbone.features[26]]
     targets = [ClassifierOutputTarget(6)]
