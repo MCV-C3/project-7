@@ -18,6 +18,8 @@ import numpy as np
 
 import pdb
 
+from helpers import freeze_all, unfreeze_module
+
 
 class SimpleModel(nn.Module):
 
@@ -51,7 +53,13 @@ class SimpleModel(nn.Module):
 
 
 class WraperModel(nn.Module):
-    def __init__(self, num_classes: int, experiment_mode: str="baseline"):
+    def __init__(
+            self,
+            num_classes: int,
+            unfreeze_blocks: int = 0,
+            dropout_blocks: int = 0,
+            dropout_value: float = 0.5,
+        ):
         """
         experiment_mode (str): Experiment configuration:
             - 'baseline': Frozen VGG16 + Simple linear layer.
@@ -66,66 +74,36 @@ class WraperModel(nn.Module):
         self.backbone = models.mnasnet1_0(weights=None)
         self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent28/Week3/mnasnet1_0-IMAGENET1K_V1.pth"))
         
-        # Get the input size of the first layer of the original classifier
-        in_features = None
-        for layer in self.backbone.classifier:
-            if isinstance(layer, nn.Linear):
-                in_features = layer.in_features
-                break
+        # ----- experiment anar descongelant blocs de darrere cap endavant -----
+        # Congelar-ho tot
+        freeze_all(self.backbone)
 
-        if in_features is None:
-            raise ValueError("No Linear layer found in the backbone classifier")
+        # Descongelar progressivament
+        backbone_blocks = list(self.backbone.layers)
+        total_blocks = len(backbone_blocks)
+        if unfreeze_blocks > 0:
+            for block in backbone_blocks[-unfreeze_blocks:]:
+                unfreeze_module(block)
 
-        # --- FREEZING LOGIC ---
-        if experiment_mode == 'finetune':
-            # Freeze everything first
-            for param in self.backbone.parameters():
-                param.requires_grad = False
-            # Unfreeze the last K feature blocks
-            K = 2
-            for block in self.backbone.layers[-K:]:
-                for param in block.parameters():
-                    param.requires_grad = True
-            print(f"MODEL SETUP: Mode '{experiment_mode}' -> Last conv block UNFROZEN.")
-        else:
-            # Freeze ALL for the rest of the modes
-            for param in self.backbone.parameters():
-                param.requires_grad = False
-            print(f"MODEL SETUP: Mode '{experiment_mode}' -> Backbone completely FROZEN.")
+        # Afegir classificador 
+        in_features = self.backbone.classifier[1].in_features
+        self.backbone.classifier = nn.Sequential(
+            nn.Linear(in_features, num_classes)
+        )
+        unfreeze_module(self.backbone.classifier)
 
-        # --- CLASSIFIER HEAD LOGIC ---
-        if experiment_mode == 'baseline':
-            self.backbone.classifier = nn.Sequential(
-                nn.Linear(in_features, num_classes)
-            )
+        print(
+            f"MODEL SETUP - Unfrozen backbone blocks: "
+            f"{max(0, total_blocks - unfreeze_blocks)} → {total_blocks - 1}"
+        )
 
-        elif experiment_mode == 'multilayer':
-            self.backbone.classifier = nn.Sequential(
-                nn.Linear(in_features, 1024),
-                nn.ReLU(),
-                nn.Linear(1024, 256),
-                nn.ReLU(),
-                nn.Linear(256, num_classes)
-            )
-
-        elif experiment_mode == 'dropout' or experiment_mode == 'finetune' or experiment_mode == 'finetune_progressive':
-            self.backbone.classifier = nn.Sequential(
-                nn.Dropout(0.2),
-                nn.Linear(in_features, num_classes)
-            )
-
-        elif experiment_mode == 'batchnorm':
-            self.backbone.classifier = nn.Sequential(
-                nn.Dropout(0.2),
-                nn.Linear(in_features, 512),
-                nn.BatchNorm1d(512),
-                nn.ReLU(),
-                nn.Dropout(0.2),
-                nn.Linear(512, num_classes)
-            )
-
-        else:
-            raise ValueError(f"Mode '{experiment_mode}' not recognized.")
+        # ----- experiment afegir dropout de darrere cap endavant -----
+        for block in backbone_blocks[:dropout_blocks]:
+            for name, module in block.named_modules():
+                if isinstance(module, nn.Conv2d):
+                    # Afegir dropout després de cada capa convolucional
+                    dropout_layer = nn.Dropout(p=dropout_value)
+                    block.add_module(f"{name}_dropout", dropout_layer)
 
     def forward(self, x):
         return self.backbone(x)

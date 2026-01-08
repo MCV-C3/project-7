@@ -11,7 +11,10 @@ import torchvision.transforms.v2  as F
 from torchviz import make_dot
 import tqdm
 
+from torchvision.models.mnasnet import _InvertedResidual
 from torchvision.transforms import Compose, ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
+from helpers import detect_mnasnet_type
+import argparse
 
 import wandb
 import os
@@ -130,24 +133,70 @@ def plot_computational_graph(model: torch.nn.Module, input_size: tuple, filename
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--disable_residual",
+        type=int,
+        default=None,
+        help="Index of _InvertedResidual block to disable (None = baseline)"
+    )
+
+    parser.add_argument(
+        "--unfreeze_blocks",
+        type=int,
+        default=0,
+        help="Number of backbone blocks to unfreeze from the end"
+    )
+
+    parser.add_argument(
+        "--dropout_blocks",
+        type=int,
+        default=0,
+        help="Number of backbone blocks to add dropout from the beginning"
+    )
+
+    parser.add_argument(
+        "--dropout_value",
+        type=float,
+        default=0.5,
+        help="Dropout value to use in dropout layers"
+    )
+
+    args = parser.parse_args()
+
+    exp_name = (
+        f"progressive_unfreeze_{args.unfreeze_blocks}_blocks"
+
+    )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
-    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent28/output'
+    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent27/output'
+    OUTPUT_PATH = os.path.join(
+        OUTPUT_PATH,
+        exp_name
+    )
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     LEARNING_RATE = 1e-3
     BATCH_SIZE = 16
     EPOCHS = 20
-    CURRENT_MODE = 'finetune_progressive'  # Options: 'baseline', 'multilayer', 'dropout', 'batchnorm', 'finetune', 'finetune_progressive'
+    CURRENT_MODE = 'baseline'  # Options: 'baseline', 'multilayer', 'dropout', 'batchnorm', 'finetune', 'finetune_progressive'
     UNFREEZE_EPOCH = 5
+    # REMOVED_RESIDUALS = ["brown"]  # Options: list of {"green", "yellow", "brown"}
 
-    wandb.init(project="C3_Week3_Task1", name=f"Exp_{CURRENT_MODE}", config={
-        "mode": CURRENT_MODE,
-        "learning_rate": LEARNING_RATE,
-        "batch_size": BATCH_SIZE,
-        "dataset": "MIT_small_train_1",
-        "epochs": EPOCHS
-    })
+    wandb.init(
+        project="C3_Week3_Task1",
+        name=exp_name,
+        config={
+            "disabled_residual": args.disable_residual,
+            "mode": CURRENT_MODE,
+            "learning_rate": LEARNING_RATE,
+            "batch_size": BATCH_SIZE,
+            "epochs": EPOCHS,
+        }
+    )
+
 
     torch.manual_seed(42)
 
@@ -168,26 +217,36 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-    model = WraperModel(num_classes=8, experiment_mode=CURRENT_MODE)
+    model = WraperModel(
+        num_classes=8,
+        unfreeze_blocks=args.unfreeze_blocks,
+        dropout_blocks=args.dropout_blocks,
+        dropout_value=args.dropout_value,
+    )
 
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
-    learning_rate = LEARNING_RATE * 0.1 if CURRENT_MODE == 'finetune' else LEARNING_RATE
+    learning_rate = LEARNING_RATE * 0.1 if args.unfreeze_blocks != 0 else LEARNING_RATE
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     num_epochs = EPOCHS
 
     train_losses, train_accuracies = [], []
     test_losses, test_accuracies = [], []
-    
-    for epoch in tqdm.tqdm(range(num_epochs), desc="TRAINING THE MODEL"):
-        if CURRENT_MODE == "finetune_progressive" and epoch == UNFREEZE_EPOCH:
-            for param in model.backbone.layers[-2:].parameters():
-                param.requires_grad = True
 
-            optimizer = optim.Adam(
-                filter(lambda p: p.requires_grad, model.parameters()),
-                lr=LEARNING_RATE * 0.1
-            )
+    for epoch in tqdm.tqdm(range(num_epochs), desc="TRAINING THE MODEL"):
+        # # Collect all inverted residual blocks in a fixed order
+        # inverted_residuals = [
+        #     m for m in model.modules() if isinstance(m, _InvertedResidual)
+        # ]
+
+        # # Disable exactly one residual if requested
+        # if args.disable_residual is not None:
+        #     assert 0 <= args.disable_residual < len(inverted_residuals), \
+        #         "Invalid residual index"
+
+        #     inverted_residuals[args.disable_residual].apply_residual = False
+        #     print(f"Disabled residual block #{args.disable_residual}")
+
 
         train_loss, train_accuracy = train(model, train_loader, criterion, optimizer, device)
         test_loss, test_accuracy = test(model, test_loader, criterion, device)
