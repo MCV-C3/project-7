@@ -253,13 +253,46 @@ if __name__ == "__main__":
         features.26
         features.28
     """
+    transforms = [
+        F.ToImage(),
+        F.ToDtype(torch.float32, scale=True),
+        F.Resize((256, 256)),
+    ]
 
-    transformation  = F.Compose([
-                                    F.ToImage(),
-                                    F.ToDtype(torch.float32, scale=True),
-                                    F.RandomHorizontalFlip(p=1.),
-                                    F.Resize(size=(256, 256)),
-                                ])
+    USE_FLIP, USE_COLOR, USE_GEOMETRIC, USE_TRANSLATION = False, False, False, False
+
+    if USE_FLIP:
+        transforms += [
+            F.RandomHorizontalFlip(p=0.5)
+        ]
+    if USE_COLOR:
+        transforms += [
+            F.ColorJitter(
+                brightness=0.2,   # + - 20%
+                contrast=0.2,
+                saturation=0.2,
+                hue=0.05
+            )
+        ]
+    if USE_GEOMETRIC:
+        transforms += [
+            F.RandomAffine(
+                degrees=10,          # rotation + - 10°
+                scale=(0.9, 1.1),    # zoom in/out
+                shear=5              # shear + - 5°
+            )
+        ]
+    if USE_TRANSLATION:
+        transforms += [
+            F.RandomAffine(
+                degrees=0,           # no rotation
+                translate=(0.1, 0.1) # + - 10% width/height
+            )
+        ]
+
+    transformation = F.Compose(transforms)
+
+
     # Example GradCAM usage
     dummy_input = Image.open("/home/cboned/data/Master/MIT_split/test/highway/art803.jpg")#torch.randn(1, 3, 224, 224)
     input_image = transformation(dummy_input).unsqueeze(0)
