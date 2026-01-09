@@ -166,8 +166,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     exp_name = (
-        f"progressive_unfreeze_{args.unfreeze_blocks}_blocks"
-
+        f"progressive_dropout_{args.dropout_blocks}_blocks_{args.dropout_value}_value"
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'

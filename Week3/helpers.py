@@ -1,4 +1,35 @@
 import torch
+import torch.nn as nn
+
+
+def add_dropout_after_block(module: nn.Module, p: float) -> nn.Module:
+    return nn.Sequential(
+        module,
+        nn.Dropout2d(p=p)
+    )
+
+def add_dropout_after_conv(module: nn.Module, p: float) -> nn.Module:
+    # Case 1: bare Conv2d
+    if isinstance(module, nn.Conv2d):
+        return nn.Sequential(
+            module,
+            nn.Dropout2d(p=p)
+        )
+    # Case 2: Sequential
+    if isinstance(module, nn.Sequential):
+        new_layers = []
+        for layer in module:
+            new_layer = add_dropout_after_conv(layer, p)
+            new_layers.append(new_layer)
+            # If layer itself was Conv2d (already wrapped above, so skip)
+            if isinstance(layer, nn.Conv2d):
+                continue
+        return nn.Sequential(*new_layers)
+    # Case 3: InvertedResidual
+    if hasattr(module, "layers") and isinstance(module.layers, nn.Sequential):
+        module.layers = add_dropout_after_conv(module.layers, p)
+    return module
+
 
 
 def detect_mnasnet_type(block):

@@ -18,7 +18,7 @@ import numpy as np
 
 import pdb
 
-from helpers import freeze_all, unfreeze_module
+from helpers import freeze_all, unfreeze_module, add_dropout_after_conv, add_dropout_after_block
 
 
 class SimpleModel(nn.Module):
@@ -97,13 +97,27 @@ class WraperModel(nn.Module):
             f"{max(0, total_blocks - unfreeze_blocks)} → {total_blocks - 1}"
         )
 
-        # ----- experiment afegir dropout de darrere cap endavant -----
-        for block in backbone_blocks[:dropout_blocks]:
-            for name, module in block.named_modules():
-                if isinstance(module, nn.Conv2d):
-                    # Afegir dropout després de cada capa convolucional
-                    dropout_layer = nn.Dropout(p=dropout_value)
-                    block.add_module(f"{name}_dropout", dropout_layer)
+        # ----- experiment afegir dropout a cada convolucional (de darrere cap endavant) -----
+        # if dropout_blocks > 0:
+        #     backbone_blocks = list(self.backbone.layers)
+        #     for i in range(len(backbone_blocks) - dropout_blocks, len(backbone_blocks)):
+        #         backbone_blocks[i] = add_dropout_after_conv(
+        #             backbone_blocks[i],
+        #             p=dropout_value
+        #         )
+        #     # write back
+        #     self.backbone.layers = nn.Sequential(*backbone_blocks)
+
+        # ----- experiment afegir un sol dropout a cada block (de darrere cap endavant) -----
+        # if dropout_blocks > 0:
+        #     backbone_blocks = list(self.backbone.layers)
+        #     for i in range(len(backbone_blocks) - dropout_blocks, len(backbone_blocks)):
+        #         backbone_blocks[i] = add_dropout_after_block(
+        #             backbone_blocks[i],
+        #             p=dropout_value
+        #         )
+        #     self.backbone.layers = nn.Sequential(*backbone_blocks)
+
 
     def forward(self, x):
         return self.backbone(x)
