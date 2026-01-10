@@ -9,7 +9,7 @@
 
 # ------------------ ENV SETUP ------------------
 module load conda
-conda activate c3
+conda activate mydl
 
 export WANDB_MODE=offline
 export WANDB_DIR=/data/uabmcv2526/mcvstudent29/wandb
