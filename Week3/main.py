@@ -278,6 +278,7 @@ if __name__ == "__main__":
         unfreeze_blocks=args.unfreeze_blocks,
         dropout_blocks=args.dropout_blocks,
         dropout_value=args.dropout_value,
+        use_batchnorm_blocks=True
     )
 
     model = model.to(device)
@@ -296,7 +297,17 @@ if __name__ == "__main__":
         weight_decay = 0.0
 
     # Use AdamW to apply weight decay in a decoupled manner (recommended for Adam-family optimizers)
+    # ADVO NEW OPTIMIZER FOR UNFRESSED AND GRADUAL BN
+    # optimizer = optim.AdamW(
+    # filter(lambda p: p.requires_grad, model.parameters()),
+    # lr=LEARNING_RATE,
+    # weight_decay=weight_decay
+    # )
+    # ADVO NEW OPTIMIZER FOR UNFRESSED AND GRADUAL BN
+    
+    # ADVO OLD OPTIMIZER Comented
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    # ADVO OLD OPTIMIZER Comented
     num_epochs = EPOCHS
 
 

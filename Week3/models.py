@@ -18,7 +18,7 @@ import numpy as np
 
 import pdb
 
-from helpers import freeze_all, unfreeze_module, add_dropout_after_conv, add_dropout_after_block
+from helpers import freeze_all, unfreeze_module, add_dropout_after_conv, add_dropout_after_block, add_batchnorm_after_block
 
 
 class SimpleModel(nn.Module):
@@ -59,6 +59,8 @@ class WraperModel(nn.Module):
             unfreeze_blocks: int = 0,
             dropout_blocks: int = 0,
             dropout_value: float = 0.5,
+            use_batchnorm_blocks: bool = False
+
         ):
         """
         experiment_mode (str): Experiment configuration:
@@ -84,6 +86,20 @@ class WraperModel(nn.Module):
         if unfreeze_blocks > 0:
             for block in backbone_blocks[-unfreeze_blocks:]:
                 unfreeze_module(block)
+                
+        # ----- experiment: BatchNorm en bloques descongelados -----
+        if use_batchnorm_blocks and unfreeze_blocks > 0:
+            backbone_blocks = list(self.backbone.layers)
+
+            start_idx = len(backbone_blocks) - unfreeze_blocks
+
+            for i in range(start_idx, len(backbone_blocks)):
+                backbone_blocks[i] = add_batchnorm_after_block(
+                    backbone_blocks[i]
+                )
+
+            # Write back modified blocks
+            self.backbone.layers = nn.Sequential(*backbone_blocks)
 
         # Afegir classificador 
         in_features = self.backbone.classifier[1].in_features
