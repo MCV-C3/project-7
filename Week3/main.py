@@ -20,7 +20,22 @@ import wandb
 import os
 
 # Train function
-def train(model, dataloader, criterion, optimizer, device):
+def train(model, dataloader, criterion, optimizer, device, reg_type: str = "none", reg_lambda: float = 0.0, reg_l1_ratio: float = 0.5):
+    """Train for one epoch and optionally include L1/L2/Elastic Net regularization in the loss.
+
+    Args:
+        model: torch.nn.Module
+        dataloader: DataLoader
+        criterion: loss function
+        optimizer: optimizer
+        device: torch.device
+        reg_type: 'none' | 'l1' | 'l2' | 'elastic'
+        reg_lambda: regularization strength (global multiplier)
+        reg_l1_ratio: mixing ratio for Elastic Net (alpha), 0 <= alpha <= 1
+
+    Returns:
+        avg_loss, accuracy
+    """
     model.train()
     train_loss = 0.0
     correct, total = 0, 0
@@ -31,6 +46,22 @@ def train(model, dataloader, criterion, optimizer, device):
         # Forward pass
         outputs = model(inputs)
         loss = criterion(outputs, labels)
+
+        # Regularization handling
+        # - L1 is added explicitly to the loss when requested
+        # - L2 is applied via optimizer weight_decay (using AdamW) when requested
+        if reg_lambda > 0.0:
+            if reg_type == "l1":
+                l1_norm = sum(p.abs().sum() for p in model.parameters() if p.requires_grad)
+                loss = loss + reg_lambda * l1_norm
+            elif reg_type == "l2":
+                # L2 handled by optimizer weight_decay; do not add explicit L2 term to the loss
+                pass
+            elif reg_type == "elastic":
+                # Elastic Net: L1 portion added to loss, L2 portion handled by optimizer via weight_decay
+                # L1 coefficient should be alpha * lambda
+                l1_norm = sum(p.abs().sum() for p in model.parameters() if p.requires_grad)
+                loss = loss + reg_lambda * (reg_l1_ratio * l1_norm)
 
         # Backward pass and optimization
         optimizer.zero_grad()
@@ -163,10 +194,33 @@ if __name__ == "__main__":
         help="Dropout value to use in dropout layers"
     )
 
+    parser.add_argument(
+        "--reg_type",
+        type=str,
+        choices=["none", "l1", "l2", "elastic"],
+        default="none",
+        help="Regularizer type: none, l1, l2, elastic"
+    )
+
+    parser.add_argument(
+        "--reg_lambda",
+        type=float,
+        default=0.0,
+        help="Regularization strength (L1 and/or L2)"
+    )
+
+    parser.add_argument(
+        "--l1_ratio",
+        type=float,
+        default=0.5,
+        help="L1 ratio for Elastic Net (alpha in [0,1]). Only used when --reg_type elastic"
+    )
+
     args = parser.parse_args()
 
     exp_name = (
         f"progressive_dropout_{args.dropout_blocks}_blocks_{args.dropout_value}_value"
+        f"_reg_{args.reg_type}_{args.reg_lambda}_l1ratio_{args.l1_ratio}"
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
@@ -193,6 +247,9 @@ if __name__ == "__main__":
             "learning_rate": LEARNING_RATE,
             "batch_size": BATCH_SIZE,
             "epochs": EPOCHS,
+            "reg_type": args.reg_type,
+            "reg_lambda": args.reg_lambda,
+            "l1_ratio": args.l1_ratio,
         }
     )
 
@@ -226,8 +283,22 @@ if __name__ == "__main__":
     model = model.to(device)
     criterion = nn.CrossEntropyLoss()
     learning_rate = LEARNING_RATE * 0.1 if args.unfreeze_blocks != 0 else LEARNING_RATE
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    # Map regularizer settings to optimizer weight_decay for L2 behavior:
+    # - l2: set weight_decay = reg_lambda
+    # - elastic: set weight_decay = (1 - l1_ratio) * reg_lambda (L2 portion handled by optimizer)
+    # - none / l1: weight_decay = 0.0 (no L2 applied via optimizer)
+    if args.reg_type == "l2":
+        weight_decay = args.reg_lambda
+    elif args.reg_type == "elastic":
+        weight_decay = (1.0 - args.l1_ratio) * args.reg_lambda
+    else:
+        weight_decay = 0.0
+
+    # Use AdamW to apply weight decay in a decoupled manner (recommended for Adam-family optimizers)
+    optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     num_epochs = EPOCHS
+
 
     train_losses, train_accuracies = [], []
     test_losses, test_accuracies = [], []
@@ -247,7 +318,7 @@ if __name__ == "__main__":
         #     print(f"Disabled residual block #{args.disable_residual}")
 
 
-        train_loss, train_accuracy = train(model, train_loader, criterion, optimizer, device)
+        train_loss, train_accuracy = train(model, train_loader, criterion, optimizer, device, args.reg_type, args.reg_lambda, args.l1_ratio)
         test_loss, test_accuracy = test(model, test_loader, criterion, device)
 
         train_losses.append(train_loss)
