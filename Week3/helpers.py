@@ -68,3 +68,22 @@ def unfreeze_module(module: torch.nn.Module):
     for p in module.parameters():
         p.requires_grad = True
 
+def add_batchnorm_after_block(block: nn.Module) -> nn.Module:
+    """
+    Adds a BatchNorm2d layer AFTER a convolutional block.
+    Assumes the block outputs a 4D tensor (N, C, H, W).
+    """
+    # Infer output channels by running a dummy tensor (safe)
+    with torch.no_grad():
+        dummy = torch.zeros(1, 3, 224, 224)
+        try:
+            out = block(dummy)
+        except:
+            return block  # safety fallback
+
+    out_channels = out.shape[1]
+
+    return nn.Sequential(
+        block,
+        nn.BatchNorm2d(out_channels)
+    )

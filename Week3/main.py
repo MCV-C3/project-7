@@ -13,7 +13,7 @@ import tqdm
 
 from torchvision.models.mnasnet import _InvertedResidual
 from torchvision.transforms import Compose, ToTensor, Normalize, RandomHorizontalFlip, RandomResizedCrop
-from helpers import detect_mnasnet_type
+from helpers import detect_mnasnet_type, add_batchnorm_after_block
 import argparse
 
 import wandb
@@ -309,6 +309,7 @@ if __name__ == "__main__":
         unfreeze_blocks=args.unfreeze_blocks,
         dropout_blocks=args.dropout_blocks,
         dropout_value=args.dropout_value,
+        use_batchnorm_blocks=True
     )
 
     model = model.to(device)
@@ -327,7 +328,17 @@ if __name__ == "__main__":
         weight_decay = 0.0
 
     # Use AdamW to apply weight decay in a decoupled manner (recommended for Adam-family optimizers)
+    # ADVO NEW OPTIMIZER FOR UNFRESSED AND GRADUAL BN
+    # optimizer = optim.AdamW(
+    # filter(lambda p: p.requires_grad, model.parameters()),
+    # lr=LEARNING_RATE,
+    # weight_decay=weight_decay
+    # )
+    # ADVO NEW OPTIMIZER FOR UNFRESSED AND GRADUAL BN
+
+    # ADVO OLD OPTIMIZER Comented
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    # ADVO OLD OPTIMIZER Comented
     num_epochs = EPOCHS
 
 
@@ -348,6 +359,34 @@ if __name__ == "__main__":
         #     inverted_residuals[args.disable_residual].apply_residual = False
         #     print(f"Disabled residual block #{args.disable_residual}")
 
+
+        # ADVO INI AÑADIR WARM UP
+        # -------- WARM-UP -> FINE-TUNING --------
+        # if epoch == UNFREEZE_EPOCH:
+        #     print(" Starting fine-tuning with BatchNorm")
+
+        #     # Descongelar bloques progresivamente
+        #     backbone_blocks = list(model.backbone.layers)
+        #     for block in backbone_blocks[-args.unfreeze_blocks:]:
+        #         for p in block.parameters():
+        #             p.requires_grad = True
+
+        #     # Activar BatchNorm en los bloques descongelados
+        #     if args.unfreeze_blocks > 0:
+        #         start_idx = len(backbone_blocks) - args.unfreeze_blocks
+        #         for i in range(start_idx, len(backbone_blocks)):
+        #             backbone_blocks[i] = add_batchnorm_after_block(
+        #                 backbone_blocks[i]
+        #             )
+        #         model.backbone.layers = nn.Sequential(*backbone_blocks)
+
+        #     # Reducir learning rate
+        #     optimizer = optim.AdamW(
+        #         filter(lambda p: p.requires_grad, model.parameters()),
+        #         lr=LEARNING_RATE * 0.1,
+        #         weight_decay=weight_decay
+        #     )
+        # ADVO FIN AÑADIR WARM UP
 
         train_loss, train_accuracy = train(model, train_loader, criterion, optimizer, device, args.reg_type, args.reg_lambda, args.l1_ratio)
         test_loss, test_accuracy = test(model, test_loader, criterion, device)
