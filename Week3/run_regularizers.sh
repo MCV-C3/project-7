@@ -39,6 +39,9 @@ for REG in "${REG_TYPES[@]}"; do
         echo ""
     else
         for L in "${LAMBDAS[@]}"; do
+            if [ "$L" = "0" ]; then
+                continue
+            fi
             if [ "${REG}" = "elastic" ]; then
                 for A in "${L1_RATIOS[@]}"; do
                     echo "=========================================="
