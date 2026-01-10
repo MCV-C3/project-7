@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
-from models import SimpleModel, WraperModel
+from models import SimpleModel, WraperModel, build_transforms
 import torchvision.transforms.v2  as F
 from torchviz import make_dot
 import tqdm
@@ -216,11 +216,27 @@ if __name__ == "__main__":
         help="L1 ratio for Elastic Net (alpha in [0,1]). Only used when --reg_type elastic"
     )
 
+    parser.add_argument(
+        "--aug_type",
+        type=str,
+        choices=["none", "flip", "color", "geometric", "translation"],
+        default="none",
+        help="Data augmentation type: none, flip, color, geometric, translation"
+    )
+
+    parser.add_argument(
+        "--aug_ratio",
+        type=float,
+        default=0.0,
+        help="Ratio of training data to augment (0.0 to 1.0)"
+    )
+
     args = parser.parse_args()
 
     exp_name = (
         f"progressive_dropout_{args.dropout_blocks}_blocks_{args.dropout_value}_value"
         f"_reg_{args.reg_type}_{args.reg_lambda}_l1ratio_{args.l1_ratio}"
+        f"_aug_{args.aug_type}_{args.aug_ratio}"
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
@@ -250,20 +266,35 @@ if __name__ == "__main__":
             "reg_type": args.reg_type,
             "reg_lambda": args.reg_lambda,
             "l1_ratio": args.l1_ratio,
+            "aug_type": args.aug_type,
+            "aug_ratio": args.aug_ratio,
         }
     )
 
 
     torch.manual_seed(42)
 
-    transformation  = F.Compose([
-                                    F.ToImage(),
-                                    F.ToDtype(torch.float32, scale=True),
-                                    F.Resize(size=(224, 224)),
-                                ])
+    # Test transformation (always no augmentation)
+    test_transformation = F.Compose([
+        F.ToImage(),
+        F.ToDtype(torch.float32, scale=True),
+        F.Resize(size=(224, 224)),
+    ])
     
-    data_train = ImageFolder(root=os.path.join(DATASET_ROOT, 'train'), transform=transformation)
-    data_test = ImageFolder(root=os.path.join(DATASET_ROOT, 'test'), transform=transformation)
+    # Training transformation (with or without augmentation)
+    if args.aug_type == "none" or args.aug_ratio == 0.0:
+        train_transformation = test_transformation
+    else:
+
+        train_transformation = build_transforms(
+            use_flip=(args.aug_type == "flip"),
+            use_color=(args.aug_type == "color"),
+            use_geometric=(args.aug_type == "geometric"),
+            use_translation=(args.aug_type == "translation")
+        )
+    
+    data_train = ImageFolder(root=os.path.join(DATASET_ROOT, 'train'), transform=train_transformation)
+    data_test = ImageFolder(root=os.path.join(DATASET_ROOT, 'test'), transform=test_transformation)
 
     train_loader = DataLoader(data_train, batch_size=BATCH_SIZE, pin_memory=True, shuffle=True, num_workers=8)
     test_loader = DataLoader(data_test, batch_size=1, pin_memory=True, shuffle=False, num_workers=8)
