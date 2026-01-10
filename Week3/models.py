@@ -72,7 +72,7 @@ class WraperModel(nn.Module):
 
         # Load pretrained VGG16 model
         self.backbone = models.mnasnet1_0(weights=None)
-        self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent28/Week3/mnasnet1_0-IMAGENET1K_V1.pth"))
+        self.backbone.load_state_dict(torch.load("/data/uabmcv2526/mcvstudent29/Week3/mnasnet1_0-IMAGENET1K_V1.pth"))
         
         # ----- experiment anar descongelant blocs de darrere cap endavant -----
         # Congelar-ho tot

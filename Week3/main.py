@@ -170,7 +170,7 @@ if __name__ == "__main__":
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
-    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent27/output'
+    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output'
     OUTPUT_PATH = os.path.join(
         OUTPUT_PATH,
         exp_name
