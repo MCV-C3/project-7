@@ -240,7 +240,7 @@ if __name__ == "__main__":
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
-    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output/regularizers/'
+    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output/data_augmentation/'
     OUTPUT_PATH = os.path.join(
         OUTPUT_PATH,
         exp_name
@@ -309,7 +309,7 @@ if __name__ == "__main__":
         unfreeze_blocks=args.unfreeze_blocks,
         dropout_blocks=args.dropout_blocks,
         dropout_value=args.dropout_value,
-        use_batchnorm_blocks=False
+        use_batchnorm_blocks=True
     )
 
     model = model.to(device)
@@ -338,7 +338,6 @@ if __name__ == "__main__":
 
     # ADVO OLD OPTIMIZER Comented
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-    # ADVO OLD OPTIMIZER Comented
     num_epochs = EPOCHS
 
 
