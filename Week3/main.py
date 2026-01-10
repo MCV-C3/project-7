@@ -224,11 +224,13 @@ if __name__ == "__main__":
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
-    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output'
-    OUTPUT_PATH = os.path.join(
-        OUTPUT_PATH,
-        exp_name
-    )
+    # OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output'
+    # OUTPUT_PATH = os.path.join(
+    #     OUTPUT_PATH,
+    #     exp_name
+    # )
+    OUTPUT_PATH = os.getcwd()
+    OUTPUT_PATH = os.path.join(OUTPUT_PATH, exp_name)
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     LEARNING_RATE = 1e-3
@@ -332,15 +334,15 @@ if __name__ == "__main__":
         # ADVO INI AÑADIR WARM UP
         # -------- WARM-UP -> FINE-TUNING --------
         # if epoch == UNFREEZE_EPOCH:
-        #     print("🔓 Starting fine-tuning with BatchNorm")
+        #     print(" Starting fine-tuning with BatchNorm")
 
-        #     # 1️⃣ Descongelar bloques progresivamente
+        #     # Descongelar bloques progresivamente
         #     backbone_blocks = list(model.backbone.layers)
         #     for block in backbone_blocks[-args.unfreeze_blocks:]:
         #         for p in block.parameters():
         #             p.requires_grad = True
 
-        #     # 2️⃣ Activar BatchNorm en los bloques descongelados
+        #     # Activar BatchNorm en los bloques descongelados
         #     if args.unfreeze_blocks > 0:
         #         start_idx = len(backbone_blocks) - args.unfreeze_blocks
         #         for i in range(start_idx, len(backbone_blocks)):
@@ -349,7 +351,7 @@ if __name__ == "__main__":
         #             )
         #         model.backbone.layers = nn.Sequential(*backbone_blocks)
 
-        #     # 3️⃣ Reducir learning rate
+        #     # Reducir learning rate
         #     optimizer = optim.AdamW(
         #         filter(lambda p: p.requires_grad, model.parameters()),
         #         lr=LEARNING_RATE * 0.1,
