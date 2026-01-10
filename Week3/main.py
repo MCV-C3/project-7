@@ -309,7 +309,7 @@ if __name__ == "__main__":
         unfreeze_blocks=args.unfreeze_blocks,
         dropout_blocks=args.dropout_blocks,
         dropout_value=args.dropout_value,
-        use_batchnorm_blocks=True
+        use_batchnorm_blocks=False
     )
 
     model = model.to(device)
