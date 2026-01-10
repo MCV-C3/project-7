@@ -15,4 +15,5 @@ export WANDB_DIR=/data/uabmcv2526/mcvstudent29/wandb
 
 cd /home/mcvstudent29/Week3
 
-python main.py
+python main.py \
+        --unfreeze_blocks 7 \
