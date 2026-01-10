@@ -239,7 +239,7 @@ if __name__ == "__main__":
     # REMOVED_RESIDUALS = ["brown"]  # Options: list of {"green", "yellow", "brown"}
 
     wandb.init(
-        project="C3_Week3_Task1",
+        project="C3_Week3_regularizers",
         name=exp_name,
         config={
             "disabled_residual": args.disable_residual,
