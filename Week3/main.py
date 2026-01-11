@@ -231,6 +231,49 @@ if __name__ == "__main__":
         help="Ratio of training data to augment (0.0 to 1.0)"
     )
 
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=16,
+        help="Batch size for training"
+    )
+
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=20,
+        help="Number of training epochs"
+    )
+
+    parser.add_argument(
+        "--optimizer",
+        type=str,
+        choices=["SGD", "Adam", "AdamW"],
+        default="AdamW",
+        help="Optimizer to use"
+    )
+
+    parser.add_argument(
+        "--learning_rate",
+        type=float,
+        default=1e-3,
+        help="Learning rate for optimizer"
+    )
+
+    parser.add_argument(
+        "--weight_decay",
+        type=float,
+        default=0.0,
+        help="Weight decay for optimizer (L2 regularization)"
+    )
+
+    parser.add_argument(
+        "--momentum",
+        type=float,
+        default=0.9,
+        help="Momentum for SGD optimizer (only used if optimizer=SGD)"
+    )
+
     args = parser.parse_args()
 
     exp_name = (
@@ -240,16 +283,17 @@ if __name__ == "__main__":
     )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
-    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output/data_augmentation/'
+    OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output/best_config_training/'
     OUTPUT_PATH = os.path.join(
         OUTPUT_PATH,
         exp_name
     )
     os.makedirs(OUTPUT_PATH, exist_ok=True)
 
-    LEARNING_RATE = 1e-3
-    BATCH_SIZE = 16
-    EPOCHS = 20
+    # Use command-line arguments for hyperparameters
+    LEARNING_RATE = args.learning_rate
+    BATCH_SIZE = args.batch_size
+    EPOCHS = args.epochs
     CURRENT_MODE = 'baseline'  # Options: 'baseline', 'multilayer', 'dropout', 'batchnorm', 'finetune', 'finetune_progressive'
     UNFREEZE_EPOCH = 5
     # REMOVED_RESIDUALS = ["brown"]  # Options: list of {"green", "yellow", "brown"}
@@ -263,6 +307,9 @@ if __name__ == "__main__":
             "learning_rate": LEARNING_RATE,
             "batch_size": BATCH_SIZE,
             "epochs": EPOCHS,
+            "optimizer": args.optimizer,
+            "weight_decay": args.weight_decay,
+            "momentum": args.momentum,
             "reg_type": args.reg_type,
             "reg_lambda": args.reg_lambda,
             "l1_ratio": args.l1_ratio,
@@ -309,7 +356,7 @@ if __name__ == "__main__":
         unfreeze_blocks=args.unfreeze_blocks,
         dropout_blocks=args.dropout_blocks,
         dropout_value=args.dropout_value,
-        use_batchnorm_blocks=True
+        use_batchnorm_blocks=False
     )
 
     model = model.to(device)
@@ -327,17 +374,31 @@ if __name__ == "__main__":
     else:
         weight_decay = 0.0
 
-    # Use AdamW to apply weight decay in a decoupled manner (recommended for Adam-family optimizers)
-    # ADVO NEW OPTIMIZER FOR UNFRESSED AND GRADUAL BN
-    # optimizer = optim.AdamW(
-    # filter(lambda p: p.requires_grad, model.parameters()),
-    # lr=LEARNING_RATE,
-    # weight_decay=weight_decay
-    # )
-    # ADVO NEW OPTIMIZER FOR UNFRESSED AND GRADUAL BN
-
-    # ADVO OLD OPTIMIZER Comented
-    optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+    # Create optimizer based on user selection
+    # Note: For regularization experiments, weight_decay is computed from reg_lambda
+    # For hyperparameter optimization experiments, use args.weight_decay directly
+    final_weight_decay = weight_decay if weight_decay > 0 else args.weight_decay
+    
+    if args.optimizer == 'SGD':
+        optimizer = optim.SGD(
+            model.parameters(),
+            lr=LEARNING_RATE,
+            momentum=args.momentum,
+            weight_decay=final_weight_decay
+        )
+    elif args.optimizer == 'Adam':
+        optimizer = optim.Adam(
+            model.parameters(),
+            lr=LEARNING_RATE,
+            weight_decay=final_weight_decay
+        )
+    elif args.optimizer == 'AdamW':
+        optimizer = optim.AdamW(
+            model.parameters(),
+            lr=LEARNING_RATE,
+            weight_decay=final_weight_decay
+        )
+    
     num_epochs = EPOCHS
 
 
