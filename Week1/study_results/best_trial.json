@@ -1,0 +1,13 @@
+{
+  "best_value": 0.3524137931034483,
+  "best_params": {
+    "codebook_size": 200,
+    "detector_type": "SIFT",
+    "dense_sift": true,
+    "sift_step": 10,
+    "sift_scales": 2,
+    "use_scaler": true,
+    "classifier_type": "logreg"
+  },
+  "datetime": "2025-12-04T14:39:58.682081"
+}

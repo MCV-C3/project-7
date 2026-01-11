@@ -1,0 +1,22 @@
+Epoch 0/20 - Train Loss: 2.5308, Train Accuracy: 0.0880, Test Loss: 2.3962, Test Accuracy: 0.1032
+Epoch 1/20 - Train Loss: 2.3832, Train Accuracy: 0.1133, Test Loss: 2.3675, Test Accuracy: 0.1168
+Epoch 2/20 - Train Loss: 2.3635, Train Accuracy: 0.1338, Test Loss: 2.3518, Test Accuracy: 0.1364
+Epoch 3/20 - Train Loss: 2.3375, Train Accuracy: 0.1421, Test Loss: 2.3593, Test Accuracy: 0.1482
+Epoch 4/20 - Train Loss: 2.3226, Train Accuracy: 0.1492, Test Loss: 2.3187, Test Accuracy: 0.1536
+Epoch 5/20 - Train Loss: 2.3099, Train Accuracy: 0.1540, Test Loss: 2.3140, Test Accuracy: 0.1559
+Epoch 6/20 - Train Loss: 2.2936, Train Accuracy: 0.1664, Test Loss: 2.3096, Test Accuracy: 0.1614
+Epoch 7/20 - Train Loss: 2.2828, Train Accuracy: 0.1666, Test Loss: 2.3151, Test Accuracy: 0.1786
+Epoch 8/20 - Train Loss: 2.2746, Train Accuracy: 0.1780, Test Loss: 2.3305, Test Accuracy: 0.1514
+Epoch 9/20 - Train Loss: 2.2585, Train Accuracy: 0.1833, Test Loss: 2.3082, Test Accuracy: 0.1641
+Epoch 10/20 - Train Loss: 2.2347, Train Accuracy: 0.1922, Test Loss: 2.3213, Test Accuracy: 0.1705
+Epoch 11/20 - Train Loss: 2.2308, Train Accuracy: 0.1986, Test Loss: 2.3094, Test Accuracy: 0.1714
+Epoch 12/20 - Train Loss: 2.2145, Train Accuracy: 0.2009, Test Loss: 2.3327, Test Accuracy: 0.1723
+Epoch 13/20 - Train Loss: 2.2025, Train Accuracy: 0.2044, Test Loss: 2.3134, Test Accuracy: 0.1777
+Epoch 14/20 - Train Loss: 2.1792, Train Accuracy: 0.2114, Test Loss: 2.3116, Test Accuracy: 0.1668
+Epoch 15/20 - Train Loss: 2.1805, Train Accuracy: 0.2159, Test Loss: 2.3285, Test Accuracy: 0.1682
+Epoch 16/20 - Train Loss: 2.1600, Train Accuracy: 0.2216, Test Loss: 2.3465, Test Accuracy: 0.1782
+Epoch 17/20 - Train Loss: 2.1450, Train Accuracy: 0.2275, Test Loss: 2.3693, Test Accuracy: 0.1705
+Epoch 18/20 - Train Loss: 2.1258, Train Accuracy: 0.2337, Test Loss: 2.3688, Test Accuracy: 0.1809
+Epoch 19/20 - Train Loss: 2.1004, Train Accuracy: 0.2459, Test Loss: 2.3949, Test Accuracy: 0.1536
+Plot saved as loss.png
+Plot saved as metrics.png

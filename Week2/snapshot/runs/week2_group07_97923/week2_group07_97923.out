@@ -1,0 +1,24 @@
+Computational graph saved as computational_graph
+Epoch 0/20 - Train Loss: 2.5533, Train Accuracy: 0.0993, Test Loss: 2.3481, Test Accuracy: 0.1391
+Epoch 1/20 - Train Loss: 2.2941, Train Accuracy: 0.1500, Test Loss: 2.2360, Test Accuracy: 0.1627
+Epoch 2/20 - Train Loss: 2.2139, Train Accuracy: 0.1783, Test Loss: 2.2090, Test Accuracy: 0.1695
+Epoch 3/20 - Train Loss: 2.1958, Train Accuracy: 0.1826, Test Loss: 2.2021, Test Accuracy: 0.1714
+Epoch 4/20 - Train Loss: 2.1687, Train Accuracy: 0.1953, Test Loss: 2.1809, Test Accuracy: 0.1973
+Epoch 5/20 - Train Loss: 2.1401, Train Accuracy: 0.2176, Test Loss: 2.1302, Test Accuracy: 0.2114
+Epoch 6/20 - Train Loss: 2.1059, Train Accuracy: 0.2285, Test Loss: 2.1129, Test Accuracy: 0.2227
+Epoch 7/20 - Train Loss: 2.0915, Train Accuracy: 0.2340, Test Loss: 2.1463, Test Accuracy: 0.2186
+Epoch 8/20 - Train Loss: 2.0850, Train Accuracy: 0.2451, Test Loss: 2.0981, Test Accuracy: 0.2218
+Epoch 9/20 - Train Loss: 2.0750, Train Accuracy: 0.2385, Test Loss: 2.0940, Test Accuracy: 0.2418
+Epoch 10/20 - Train Loss: 2.0482, Train Accuracy: 0.2503, Test Loss: 2.0706, Test Accuracy: 0.2364
+Epoch 11/20 - Train Loss: 2.0525, Train Accuracy: 0.2522, Test Loss: 2.0922, Test Accuracy: 0.2405
+Epoch 12/20 - Train Loss: 2.0212, Train Accuracy: 0.2717, Test Loss: 2.0839, Test Accuracy: 0.2459
+Epoch 13/20 - Train Loss: 2.0143, Train Accuracy: 0.2705, Test Loss: 2.1675, Test Accuracy: 0.2268
+Epoch 14/20 - Train Loss: 1.9818, Train Accuracy: 0.2813, Test Loss: 2.0817, Test Accuracy: 0.2445
+Epoch 15/20 - Train Loss: 1.9686, Train Accuracy: 0.2869, Test Loss: 2.1012, Test Accuracy: 0.2473
+Epoch 16/20 - Train Loss: 1.9589, Train Accuracy: 0.2880, Test Loss: 2.0793, Test Accuracy: 0.2323
+Epoch 17/20 - Train Loss: 1.9962, Train Accuracy: 0.2825, Test Loss: 2.0914, Test Accuracy: 0.2482
+Epoch 18/20 - Train Loss: 1.9483, Train Accuracy: 0.3009, Test Loss: 2.0736, Test Accuracy: 0.2532
+Epoch 19/20 - Train Loss: 1.9430, Train Accuracy: 0.3007, Test Loss: 2.0721, Test Accuracy: 0.2559
+Plot saved as loss.png
+Plot saved as metrics.png
+Tabla de aciertos guardada en: /export/home/group07/week2/runs/week2_group07_97923/tabla_aciertos.png

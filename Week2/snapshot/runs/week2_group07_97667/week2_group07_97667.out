@@ -1,0 +1,43 @@
+Computational graph saved as computational_graph
+Epoch 0/40 - Train Loss: 2.5204, Train Accuracy: 0.1029, Test Loss: 2.3060, Test Accuracy: 0.1364
+Epoch 1/40 - Train Loss: 2.2883, Train Accuracy: 0.1549, Test Loss: 2.2426, Test Accuracy: 0.1577
+Epoch 2/40 - Train Loss: 2.2136, Train Accuracy: 0.1900, Test Loss: 2.2243, Test Accuracy: 0.1945
+Epoch 3/40 - Train Loss: 2.1854, Train Accuracy: 0.1940, Test Loss: 2.1990, Test Accuracy: 0.1818
+Epoch 4/40 - Train Loss: 2.1539, Train Accuracy: 0.2131, Test Loss: 2.2011, Test Accuracy: 0.1895
+Epoch 5/40 - Train Loss: 2.1279, Train Accuracy: 0.2234, Test Loss: 2.1335, Test Accuracy: 0.2195
+Epoch 6/40 - Train Loss: 2.1118, Train Accuracy: 0.2336, Test Loss: 2.1140, Test Accuracy: 0.2295
+Epoch 7/40 - Train Loss: 2.0872, Train Accuracy: 0.2415, Test Loss: 2.1465, Test Accuracy: 0.2150
+Epoch 8/40 - Train Loss: 2.0978, Train Accuracy: 0.2386, Test Loss: 2.1135, Test Accuracy: 0.2236
+Epoch 9/40 - Train Loss: 2.0637, Train Accuracy: 0.2472, Test Loss: 2.1001, Test Accuracy: 0.2373
+Epoch 10/40 - Train Loss: 2.0479, Train Accuracy: 0.2540, Test Loss: 2.1031, Test Accuracy: 0.2323
+Epoch 11/40 - Train Loss: 2.0354, Train Accuracy: 0.2622, Test Loss: 2.0725, Test Accuracy: 0.2418
+Epoch 12/40 - Train Loss: 2.0281, Train Accuracy: 0.2632, Test Loss: 2.1206, Test Accuracy: 0.2245
+Epoch 13/40 - Train Loss: 2.0109, Train Accuracy: 0.2683, Test Loss: 2.0659, Test Accuracy: 0.2491
+Epoch 14/40 - Train Loss: 1.9876, Train Accuracy: 0.2853, Test Loss: 2.1146, Test Accuracy: 0.2450
+Epoch 15/40 - Train Loss: 1.9829, Train Accuracy: 0.2821, Test Loss: 2.0791, Test Accuracy: 0.2409
+Epoch 16/40 - Train Loss: 1.9570, Train Accuracy: 0.2955, Test Loss: 2.0604, Test Accuracy: 0.2505
+Epoch 17/40 - Train Loss: 1.9666, Train Accuracy: 0.2902, Test Loss: 2.0837, Test Accuracy: 0.2259
+Epoch 18/40 - Train Loss: 1.9759, Train Accuracy: 0.2829, Test Loss: 2.0700, Test Accuracy: 0.2595
+Epoch 19/40 - Train Loss: 1.9384, Train Accuracy: 0.2977, Test Loss: 2.0837, Test Accuracy: 0.2545
+Epoch 20/40 - Train Loss: 1.9369, Train Accuracy: 0.2978, Test Loss: 2.1303, Test Accuracy: 0.2409
+Epoch 21/40 - Train Loss: 1.9281, Train Accuracy: 0.2961, Test Loss: 2.0609, Test Accuracy: 0.2568
+Epoch 22/40 - Train Loss: 1.9062, Train Accuracy: 0.3080, Test Loss: 2.0682, Test Accuracy: 0.2468
+Epoch 23/40 - Train Loss: 1.9076, Train Accuracy: 0.3136, Test Loss: 2.0660, Test Accuracy: 0.2541
+Epoch 24/40 - Train Loss: 1.8731, Train Accuracy: 0.3238, Test Loss: 2.0687, Test Accuracy: 0.2605
+Epoch 25/40 - Train Loss: 1.8626, Train Accuracy: 0.3240, Test Loss: 2.1141, Test Accuracy: 0.2514
+Epoch 26/40 - Train Loss: 1.8304, Train Accuracy: 0.3399, Test Loss: 2.0787, Test Accuracy: 0.2655
+Epoch 27/40 - Train Loss: 1.8492, Train Accuracy: 0.3255, Test Loss: 2.1116, Test Accuracy: 0.2500
+Epoch 28/40 - Train Loss: 1.8428, Train Accuracy: 0.3387, Test Loss: 2.1316, Test Accuracy: 0.2573
+Epoch 29/40 - Train Loss: 1.7950, Train Accuracy: 0.3459, Test Loss: 2.1897, Test Accuracy: 0.2550
+Epoch 30/40 - Train Loss: 1.7878, Train Accuracy: 0.3494, Test Loss: 2.1614, Test Accuracy: 0.2632
+Epoch 31/40 - Train Loss: 1.7434, Train Accuracy: 0.3720, Test Loss: 2.3402, Test Accuracy: 0.2505
+Epoch 32/40 - Train Loss: 1.7406, Train Accuracy: 0.3676, Test Loss: 2.1598, Test Accuracy: 0.2564
+Epoch 33/40 - Train Loss: 1.7206, Train Accuracy: 0.3730, Test Loss: 2.1938, Test Accuracy: 0.2500
+Epoch 34/40 - Train Loss: 1.6892, Train Accuracy: 0.3892, Test Loss: 2.1514, Test Accuracy: 0.2527
+Epoch 35/40 - Train Loss: 1.6831, Train Accuracy: 0.3923, Test Loss: 2.2265, Test Accuracy: 0.2523
+Epoch 36/40 - Train Loss: 1.6518, Train Accuracy: 0.4013, Test Loss: 2.2994, Test Accuracy: 0.2564
+Epoch 37/40 - Train Loss: 1.6391, Train Accuracy: 0.4111, Test Loss: 2.3140, Test Accuracy: 0.2636
+Epoch 38/40 - Train Loss: 1.6267, Train Accuracy: 0.4116, Test Loss: 2.3211, Test Accuracy: 0.2477
+Epoch 39/40 - Train Loss: 1.6061, Train Accuracy: 0.4172, Test Loss: 2.2948, Test Accuracy: 0.2650
+Plot saved as loss.png
+Plot saved as metrics.png
