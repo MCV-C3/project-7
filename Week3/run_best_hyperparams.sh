@@ -32,6 +32,7 @@ echo "Val Acc: 0.8725, Overfitting: 0.1075"
 echo "=========================================="
 
 python main.py \
+    --experiment_name "trial_38_best_accuracy" \
     --unfreeze_blocks 7 \
     --batch_size 8 \
     --epochs 20 \
@@ -56,6 +57,7 @@ echo "Val Acc: 0.7723, Overfitting: -0.0395"
 echo "=========================================="
 
 python main.py \
+    --experiment_name "trial_34_recommended_balanced" \
     --unfreeze_blocks 7 \
     --batch_size 8 \
     --epochs 20 \

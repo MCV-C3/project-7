@@ -274,13 +274,23 @@ if __name__ == "__main__":
         help="Momentum for SGD optimizer (only used if optimizer=SGD)"
     )
 
+    parser.add_argument(
+        "--experiment_name",
+        type=str,
+        default=None,
+        help="Custom experiment name (overrides auto-generated name)"
+    )
+
     args = parser.parse_args()
 
-    exp_name = (
-        f"progressive_dropout_{args.dropout_blocks}_blocks_{args.dropout_value}_value"
-        f"_reg_{args.reg_type}_{args.reg_lambda}_l1ratio_{args.l1_ratio}"
-        f"_aug_{args.aug_type}_{args.aug_ratio}"
-    )
+    if args.experiment_name:
+        exp_name = args.experiment_name
+    else:
+        exp_name = (
+            f"progressive_dropout_{args.dropout_blocks}_blocks_{args.dropout_value}_value"
+            f"_reg_{args.reg_type}_{args.reg_lambda}_l1ratio_{args.l1_ratio}"
+            f"_aug_{args.aug_type}_{args.aug_ratio}"
+        )
 
     DATASET_ROOT = '/data/uabmcv2526/shared/dataset/2425/MIT_small_train_1'
     OUTPUT_PATH = '/data/uabmcv2526/mcvstudent29/output/best_config_training/'
@@ -408,6 +418,7 @@ if __name__ == "__main__":
     # Track best validation accuracy and save best model
     best_val_acc = 0.0
     best_epoch = 0
+    model_path = os.path.join(OUTPUT_PATH, "best_model.pt")
 
     for epoch in tqdm.tqdm(range(num_epochs), desc="TRAINING THE MODEL"):
         # # Collect all inverted residual blocks in a fixed order
@@ -468,7 +479,6 @@ if __name__ == "__main__":
         if test_accuracy > best_val_acc:
             best_val_acc = test_accuracy
             best_epoch = epoch + 1
-            model_path = .join(OUTPUT_PATH, "saved_model.pt")
             torch.save(model.state_dict(), model_path)
             print(f"  → New best model saved! Val Acc: {best_val_acc:.4f}")
 
