@@ -342,7 +342,7 @@ if __name__ == "__main__":
     if args.aug_type == "none" or args.aug_ratio == 0.0:
         train_transformation = test_transformation
     else:
-
+        print(f"DEBUG: Building transforms with aug_type={args.aug_type}, aug_ratio={args.aug_ratio}")
         train_transformation = build_transforms(
             use_flip=(args.aug_type == "flip"),
             use_color=(args.aug_type == "color"),
@@ -350,6 +350,7 @@ if __name__ == "__main__":
             use_translation=(args.aug_type == "translation"),
             aug_ratio=args.aug_ratio
         )
+        print(f"DEBUG: Transforms built: {train_transformation}")
     
     data_train = ImageFolder(root=os.path.join(DATASET_ROOT, 'train'), transform=train_transformation)
     data_test = ImageFolder(root=os.path.join(DATASET_ROOT, 'test'), transform=test_transformation)
@@ -393,20 +394,20 @@ if __name__ == "__main__":
     if args.optimizer == 'SGD':
         optimizer = optim.SGD(
             model.parameters(),
-            lr=LEARNING_RATE,
+            lr=learning_rate,
             momentum=args.momentum,
             weight_decay=final_weight_decay
         )
     elif args.optimizer == 'Adam':
         optimizer = optim.Adam(
             model.parameters(),
-            lr=LEARNING_RATE,
+            lr=learning_rate,
             weight_decay=final_weight_decay
         )
     elif args.optimizer == 'AdamW':
         optimizer = optim.AdamW(
             model.parameters(),
-            lr=LEARNING_RATE,
+            lr=learning_rate,
             weight_decay=final_weight_decay
         )
     

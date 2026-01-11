@@ -34,7 +34,11 @@ for AUG in "${AUG_TYPES[@]}"; do
             --reg_lambda 0 \
             --l1_ratio 0.5 \
             --aug_type none \
-            --aug_ratio 0.0
+            --aug_ratio 0.0 \
+            --batch_size 16 \
+            --epochs 20 \
+            --optimizer AdamW \
+            --learning_rate 0.001
 
         echo "Finished AUG_TYPE=none, AUG_RATIO=0.0"
         echo ""
@@ -52,7 +56,11 @@ for AUG in "${AUG_TYPES[@]}"; do
                     --reg_lambda 0 \
                     --l1_ratio 0.5 \
                     --aug_type ${AUG} \
-                    --aug_ratio ${RATIO}
+                    --aug_ratio ${RATIO} \
+                    --batch_size 16 \
+                    --epochs 20 \
+                    --optimizer AdamW \
+                    --learning_rate 0.001
 
                 echo "Finished AUG_TYPE=${AUG}, AUG_RATIO=${RATIO}"
                 echo ""

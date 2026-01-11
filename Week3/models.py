@@ -242,7 +242,7 @@ def build_transforms(use_flip: bool = False,
     transforms = [
             F.ToImage(),
             F.ToDtype(torch.float32, scale=True),
-            F.Resize((256, 256)),
+            F.Resize((224, 224)),
         ]
     
     if use_flip:
