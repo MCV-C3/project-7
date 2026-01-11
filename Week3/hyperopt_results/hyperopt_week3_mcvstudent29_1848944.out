@@ -1,0 +1,1184 @@
+Starting hyperparameter optimization...
+Date: Sun Jan 11 10:47:12 CET 2026
+Host: gpu17
+Current directory: /home/mcvstudent29/Week3
+Using device: cuda
+Loaded dataset with 400 samples from /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1/train
+
+Starting Optuna optimization with 50 trials...
+======================================================================
+
+Trial 0:
+  batch_size=16, epochs=10, optimizer=AdamW
+  learning_rate=0.000636, momentum=0.000, weight_decay=0.000680
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9962, Val Acc: 0.7687, Overfitting: 0.2276
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.5468, Val Acc: 0.6391, Overfitting: -0.0923
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9888, Val Acc: 0.8120, Overfitting: 0.1767
+
+Trial 0 Results:
+  Mean Train Acc: 0.8439
+  Mean Val Acc: 0.7399 (±0.0735)
+  Mean Overfitting: 0.1040 (±0.1403)
+[I 2026-01-11 10:47:49,744] Trial 0 finished with values: [0.7399281786555942, -0.10401219662718202] and parameters: {'batch_size': 16, 'epochs': 10, 'optimizer': 'AdamW', 'learning_rate': 0.0006358358856676254, 'weight_decay': 0.0006796578090758161}.
+
+Trial 1:
+  batch_size=16, epochs=10, optimizer=AdamW
+  learning_rate=0.000198, momentum=0.000, weight_decay=0.000015
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9962, Val Acc: 0.8134, Overfitting: 0.1828
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9925, Val Acc: 0.7068, Overfitting: 0.2857
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 1.0000, Val Acc: 0.5714, Overfitting: 0.4286
+
+Trial 1 Results:
+  Mean Train Acc: 0.9962
+  Mean Val Acc: 0.6972 (±0.0990)
+  Mean Overfitting: 0.2990 (±0.1008)
+[I 2026-01-11 10:48:05,233] Trial 1 finished with values: [0.6972094415142335, -0.2990405467523132] and parameters: {'batch_size': 16, 'epochs': 10, 'optimizer': 'AdamW', 'learning_rate': 0.00019762189340280086, 'weight_decay': 1.461896279370496e-05}.
+
+Trial 2:
+  batch_size=8, epochs=20, optimizer=SGD
+  learning_rate=0.000599, momentum=0.601, weight_decay=0.000002
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.8571, Val Acc: 0.7164, Overfitting: 0.1407
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.8801, Val Acc: 0.6767, Overfitting: 0.2035
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.8427, Val Acc: 0.6917, Overfitting: 0.1510
+
+Trial 2 Results:
+  Mean Train Acc: 0.8600
+  Mean Val Acc: 0.6949 (±0.0164)
+  Mean Overfitting: 0.1651 (±0.0275)
+[I 2026-01-11 10:48:41,123] Trial 2 finished with values: [0.6949463210264467, -0.1650501120036942] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'SGD', 'learning_rate': 0.0005987474910461401, 'weight_decay': 1.5339162591163623e-06, 'momentum': 0.6014694033824239}.
+
+Trial 3:
+  batch_size=64, epochs=30, optimizer=AdamW
+  learning_rate=0.000209, momentum=0.000, weight_decay=0.000003
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 1.0000, Val Acc: 0.7612, Overfitting: 0.2388
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9925, Val Acc: 0.5714, Overfitting: 0.4211
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9963, Val Acc: 0.6466, Overfitting: 0.3496
+
+Trial 3 Results:
+  Mean Train Acc: 0.9963
+  Mean Val Acc: 0.6597 (±0.0780)
+  Mean Overfitting: 0.3365 (±0.0750)
+[I 2026-01-11 10:49:43,674] Trial 3 finished with values: [0.659746380877567, -0.336508300770373] and parameters: {'batch_size': 64, 'epochs': 30, 'optimizer': 'AdamW', 'learning_rate': 0.00020914981329035596, 'weight_decay': 3.0771802712506896e-06}.
+
+Trial 4:
+  batch_size=32, epochs=25, optimizer=AdamW
+  learning_rate=0.000036, momentum=0.000, weight_decay=0.007557
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9850, Val Acc: 0.7164, Overfitting: 0.2685
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9850, Val Acc: 0.6917, Overfitting: 0.2933
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9775, Val Acc: 0.5789, Overfitting: 0.3986
+
+Trial 4 Results:
+  Mean Train Acc: 0.9825
+  Mean Val Acc: 0.6624 (±0.0598)
+  Mean Overfitting: 0.3201 (±0.0564)
+[I 2026-01-11 10:50:24,275] Trial 4 finished with values: [0.6623648673923616, -0.32013820677245125] and parameters: {'batch_size': 32, 'epochs': 25, 'optimizer': 'AdamW', 'learning_rate': 3.585612610345396e-05, 'weight_decay': 0.00755681014127443}.
+
+Trial 5:
+  batch_size=16, epochs=30, optimizer=Adam
+  learning_rate=0.000095, momentum=0.000, weight_decay=0.000036
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9962, Val Acc: 0.7836, Overfitting: 0.2127
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.7068, Overfitting: 0.2932
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 1.0000, Val Acc: 0.6992, Overfitting: 0.3008
+
+Trial 5 Results:
+  Mean Train Acc: 0.9987
+  Mean Val Acc: 0.7299 (±0.0381)
+  Mean Overfitting: 0.2689 (±0.0399)
+[I 2026-01-11 10:51:11,149] Trial 5 finished with values: [0.7298657090487413, -0.2688811581191785] and parameters: {'batch_size': 16, 'epochs': 30, 'optimizer': 'Adam', 'learning_rate': 9.46217535646148e-05, 'weight_decay': 3.58681649862755e-05}.
+
+Trial 6:
+  batch_size=16, epochs=20, optimizer=Adam
+  learning_rate=0.009134, momentum=0.000, weight_decay=0.001227
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.4511, Val Acc: 0.2313, Overfitting: 0.2198
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.8202, Val Acc: 0.2632, Overfitting: 0.5571
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.5169, Val Acc: 0.2105, Overfitting: 0.3063
+
+Trial 6 Results:
+  Mean Train Acc: 0.5961
+  Mean Val Acc: 0.2350 (±0.0216)
+  Mean Overfitting: 0.3611 (±0.1430)
+[I 2026-01-11 10:51:43,836] Trial 6 finished with values: [0.23500916470280178, -0.3610596590419534] and parameters: {'batch_size': 16, 'epochs': 20, 'optimizer': 'Adam', 'learning_rate': 0.009133995846860976, 'weight_decay': 0.001227380098785297}.
+
+Trial 7:
+  batch_size=32, epochs=25, optimizer=SGD
+  learning_rate=0.000022, momentum=0.617, weight_decay=0.002834
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.1316, Val Acc: 0.1194, Overfitting: 0.0122
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.1610, Val Acc: 0.1579, Overfitting: 0.0032
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.0936, Val Acc: 0.1128, Overfitting: -0.0191
+
+Trial 7 Results:
+  Mean Train Acc: 0.1288
+  Mean Val Acc: 0.1300 (±0.0199)
+  Mean Overfitting: -0.0013 (±0.0132)
+[I 2026-01-11 10:52:24,768] Trial 7 finished with values: [0.13002655893465007, 0.001273027165151398] and parameters: {'batch_size': 32, 'epochs': 25, 'optimizer': 'SGD', 'learning_rate': 2.2264204303769678e-05, 'weight_decay': 0.0028340904295147754, 'momentum': 0.6170651455592824}.
+
+Trial 8:
+  batch_size=8, epochs=25, optimizer=Adam
+  learning_rate=0.000023, momentum=0.000, weight_decay=0.000713
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9323, Val Acc: 0.7836, Overfitting: 0.1487
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9251, Val Acc: 0.7444, Overfitting: 0.1807
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9401, Val Acc: 0.7293, Overfitting: 0.2108
+
+Trial 8 Results:
+  Mean Train Acc: 0.9325
+  Mean Val Acc: 0.7524 (±0.0229)
+  Mean Overfitting: 0.1801 (±0.0253)
+[I 2026-01-11 10:53:11,100] Trial 8 finished with values: [0.7524221000261848, -0.1800776887716524] and parameters: {'batch_size': 8, 'epochs': 25, 'optimizer': 'Adam', 'learning_rate': 2.284455685002053e-05, 'weight_decay': 0.0007128188058401369}.
+
+Trial 9:
+  batch_size=32, epochs=20, optimizer=SGD
+  learning_rate=0.000012, momentum=0.311, weight_decay=0.000351
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.0940, Val Acc: 0.0821, Overfitting: 0.0119
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.1124, Val Acc: 0.1053, Overfitting: 0.0071
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.1273, Val Acc: 0.1729, Overfitting: -0.0456
+
+Trial 9 Results:
+  Mean Train Acc: 0.1112
+  Mean Val Acc: 0.1201 (±0.0385)
+  Mean Overfitting: -0.0089 (±0.0260)
+[I 2026-01-11 10:53:43,844] Trial 9 finished with values: [0.12009501365353682, 0.008866568007586742] and parameters: {'batch_size': 32, 'epochs': 20, 'optimizer': 'SGD', 'learning_rate': 1.2424747083660186e-05, 'weight_decay': 0.00035127047262708476, 'momentum': 0.3112124212655634}.
+
+Trial 10:
+  batch_size=64, epochs=10, optimizer=AdamW
+  learning_rate=0.001300, momentum=0.000, weight_decay=0.000183
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9925, Val Acc: 0.7463, Overfitting: 0.2462
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9925, Val Acc: 0.7068, Overfitting: 0.2857
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.4494, Val Acc: 0.7068, Overfitting: -0.2573
+
+Trial 10 Results:
+  Mean Train Acc: 0.8115
+  Mean Val Acc: 0.7199 (±0.0186)
+  Mean Overfitting: 0.0915 (±0.2472)
+[I 2026-01-11 10:54:04,725] Trial 10 finished with values: [0.7199341637676281, -0.09154209241590194] and parameters: {'batch_size': 64, 'epochs': 10, 'optimizer': 'AdamW', 'learning_rate': 0.0013004598431975234, 'weight_decay': 0.0001830005364066774}.
+
+Trial 11:
+  batch_size=64, epochs=15, optimizer=SGD
+  learning_rate=0.003159, momentum=0.976, weight_decay=0.000128
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9173, Val Acc: 0.7463, Overfitting: 0.1710
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9288, Val Acc: 0.7143, Overfitting: 0.2146
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.8914, Val Acc: 0.7444, Overfitting: 0.1470
+
+Trial 11 Results:
+  Mean Train Acc: 0.9125
+  Mean Val Acc: 0.7350 (±0.0146)
+  Mean Overfitting: 0.1775 (±0.0279)
+[I 2026-01-11 10:54:36,103] Trial 11 finished with values: [0.7349717577525904, -0.17753422630868632] and parameters: {'batch_size': 64, 'epochs': 15, 'optimizer': 'SGD', 'learning_rate': 0.0031589617798186776, 'weight_decay': 0.0001277521511081064, 'momentum': 0.9763459870547866}.
+
+Trial 12:
+  batch_size=64, epochs=15, optimizer=AdamW
+  learning_rate=0.001808, momentum=0.000, weight_decay=0.005524
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.4812, Val Acc: 0.6493, Overfitting: -0.1681
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9813, Val Acc: 0.5865, Overfitting: 0.3948
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9813, Val Acc: 0.8421, Overfitting: 0.1392
+
+Trial 12 Results:
+  Mean Train Acc: 0.8146
+  Mean Val Acc: 0.6926 (±0.1088)
+  Mean Overfitting: 0.1220 (±0.2301)
+[I 2026-01-11 10:55:07,532] Trial 12 finished with values: [0.6926083866382373, -0.12197488802782852] and parameters: {'batch_size': 64, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 0.0018084488369453948, 'weight_decay': 0.005523921577573468}.
+
+Trial 13:
+  batch_size=64, epochs=15, optimizer=AdamW
+  learning_rate=0.001900, momentum=0.000, weight_decay=0.000096
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9774, Val Acc: 0.6567, Overfitting: 0.3207
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9700, Val Acc: 0.7594, Overfitting: 0.2106
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9850, Val Acc: 0.6617, Overfitting: 0.3234
+
+Trial 13 Results:
+  Mean Train Acc: 0.9775
+  Mean Val Acc: 0.6926 (±0.0473)
+  Mean Overfitting: 0.2849 (±0.0525)
+[I 2026-01-11 10:55:38,995] Trial 13 finished with values: [0.6925896831631317, -0.2849102464361474] and parameters: {'batch_size': 64, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 0.001899810860331492, 'weight_decay': 9.60924568793252e-05}.
+
+Trial 14:
+  batch_size=64, epochs=10, optimizer=SGD
+  learning_rate=0.008205, momentum=0.010, weight_decay=0.000010
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.8195, Val Acc: 0.5970, Overfitting: 0.2225
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.8277, Val Acc: 0.5940, Overfitting: 0.2337
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.7453, Val Acc: 0.5940, Overfitting: 0.1513
+
+Trial 14 Results:
+  Mean Train Acc: 0.7975
+  Mean Val Acc: 0.5950 (±0.0014)
+  Mean Overfitting: 0.2025 (±0.0365)
+[I 2026-01-11 10:55:59,975] Trial 14 finished with values: [0.5949949500617215, -0.20253257662015178] and parameters: {'batch_size': 64, 'epochs': 10, 'optimizer': 'SGD', 'learning_rate': 0.008205433899739599, 'weight_decay': 1.027852480488914e-05, 'momentum': 0.010493361329585282}.
+
+Trial 15:
+  batch_size=32, epochs=25, optimizer=AdamW
+  learning_rate=0.000700, momentum=0.000, weight_decay=0.000144
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 1.0000, Val Acc: 0.8731, Overfitting: 0.1269
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.7444, Overfitting: 0.2556
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9963, Val Acc: 0.8120, Overfitting: 0.1842
+
+Trial 15 Results:
+  Mean Train Acc: 0.9988
+  Mean Val Acc: 0.8098 (±0.0526)
+  Mean Overfitting: 0.1889 (±0.0527)
+[I 2026-01-11 10:56:43,534] Trial 15 finished with values: [0.8098417686006059, -0.18890979194870738] and parameters: {'batch_size': 32, 'epochs': 25, 'optimizer': 'AdamW', 'learning_rate': 0.0007002906478074145, 'weight_decay': 0.00014440075488571512}.
+
+Trial 16:
+  batch_size=64, epochs=10, optimizer=AdamW
+  learning_rate=0.000798, momentum=0.000, weight_decay=0.000390
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 1.0000, Val Acc: 0.6716, Overfitting: 0.3284
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9925, Val Acc: 0.7218, Overfitting: 0.2707
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9588, Val Acc: 0.6090, Overfitting: 0.3498
+
+Trial 16 Results:
+  Mean Train Acc: 0.9838
+  Mean Val Acc: 0.6675 (±0.0461)
+  Mean Overfitting: 0.3163 (±0.0334)
+[I 2026-01-11 10:57:04,347] Trial 16 finished with values: [0.6674896195713164, -0.3162806675697573] and parameters: {'batch_size': 64, 'epochs': 10, 'optimizer': 'AdamW', 'learning_rate': 0.0007979917037193799, 'weight_decay': 0.0003904648518826859}.
+
+Trial 17:
+  batch_size=8, epochs=15, optimizer=AdamW
+  learning_rate=0.003960, momentum=0.000, weight_decay=0.000042
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.4887, Val Acc: 0.2537, Overfitting: 0.2350
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.5056, Val Acc: 0.3008, Overfitting: 0.2049
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.7154, Val Acc: 0.4286, Overfitting: 0.2868
+
+Trial 17 Results:
+  Mean Train Acc: 0.5699
+  Mean Val Acc: 0.3277 (±0.0739)
+  Mean Overfitting: 0.2422 (±0.0338)
+[I 2026-01-11 10:57:31,849] Trial 17 finished with values: [0.32768488385141964, -0.2422136452428517] and parameters: {'batch_size': 8, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 0.003959618878357857, 'weight_decay': 4.150548018455695e-05}.
+
+Trial 18:
+  batch_size=16, epochs=10, optimizer=Adam
+  learning_rate=0.000462, momentum=0.000, weight_decay=0.001401
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9662, Val Acc: 0.5746, Overfitting: 0.3915
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.4757, Val Acc: 0.5714, Overfitting: -0.0958
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.5094, Val Acc: 0.4060, Overfitting: 0.1033
+
+Trial 18 Results:
+  Mean Train Acc: 0.6504
+  Mean Val Acc: 0.5174 (±0.0787)
+  Mean Overfitting: 0.1330 (±0.2000)
+[I 2026-01-11 10:57:47,658] Trial 18 finished with values: [0.5173568248980661, -0.13303788847713224] and parameters: {'batch_size': 16, 'epochs': 10, 'optimizer': 'Adam', 'learning_rate': 0.00046235420384240785, 'weight_decay': 0.0014012366471299693}.
+
+Trial 19:
+  batch_size=64, epochs=10, optimizer=AdamW
+  learning_rate=0.000092, momentum=0.000, weight_decay=0.000219
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9774, Val Acc: 0.5821, Overfitting: 0.3954
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9775, Val Acc: 0.4887, Overfitting: 0.4888
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9513, Val Acc: 0.5865, Overfitting: 0.3648
+
+Trial 19 Results:
+  Mean Train Acc: 0.9688
+  Mean Val Acc: 0.5524 (±0.0451)
+  Mean Overfitting: 0.4163 (±0.0527)
+[I 2026-01-11 10:58:08,636] Trial 19 finished with values: [0.5524258407212059, -0.41633501272326656] and parameters: {'batch_size': 64, 'epochs': 10, 'optimizer': 'AdamW', 'learning_rate': 9.15015879573553e-05, 'weight_decay': 0.00021932537160917876}.
+
+Trial 20:
+  batch_size=64, epochs=15, optimizer=AdamW
+  learning_rate=0.001524, momentum=0.000, weight_decay=0.000069
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9887, Val Acc: 0.8209, Overfitting: 0.1678
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.5318, Val Acc: 0.5639, Overfitting: -0.0321
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9813, Val Acc: 0.6090, Overfitting: 0.3723
+
+Trial 20 Results:
+  Mean Train Acc: 0.8339
+  Mean Val Acc: 0.6646 (±0.1120)
+  Mean Overfitting: 0.1693 (±0.1651)
+[I 2026-01-11 10:58:40,042] Trial 20 finished with values: [0.6646092844050425, -0.16933418850945348] and parameters: {'batch_size': 64, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 0.0015235277588538842, 'weight_decay': 6.897395462103526e-05}.
+
+Trial 21:
+  batch_size=32, epochs=25, optimizer=SGD
+  learning_rate=0.001239, momentum=0.891, weight_decay=0.002617
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9398, Val Acc: 0.7015, Overfitting: 0.2384
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9738, Val Acc: 0.6692, Overfitting: 0.3046
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.8652, Val Acc: 0.6842, Overfitting: 0.1810
+
+Trial 21 Results:
+  Mean Train Acc: 0.9263
+  Mean Val Acc: 0.6850 (±0.0132)
+  Mean Overfitting: 0.2413 (±0.0505)
+[I 2026-01-11 10:59:20,990] Trial 21 finished with values: [0.6849586653200165, -0.24130831298717473] and parameters: {'batch_size': 32, 'epochs': 25, 'optimizer': 'SGD', 'learning_rate': 0.001239272164013171, 'weight_decay': 0.002617060934651948, 'momentum': 0.8912126884151748}.
+
+Trial 22:
+  batch_size=64, epochs=20, optimizer=AdamW
+  learning_rate=0.003768, momentum=0.000, weight_decay=0.000020
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.8947, Val Acc: 0.7239, Overfitting: 0.1709
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.6180, Val Acc: 0.6015, Overfitting: 0.0165
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.5581, Val Acc: 0.5639, Overfitting: -0.0059
+
+Trial 22 Results:
+  Mean Train Acc: 0.6903
+  Mean Val Acc: 0.6298 (±0.0683)
+  Mean Overfitting: 0.0605 (±0.0786)
+[I 2026-01-11 11:00:02,944] Trial 22 finished with values: [0.6297647102831706, -0.060490891267522606] and parameters: {'batch_size': 64, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0037682220379917147, 'weight_decay': 2.0193932266523454e-05}.
+
+Trial 23:
+  batch_size=8, epochs=30, optimizer=Adam
+  learning_rate=0.004428, momentum=0.000, weight_decay=0.000008
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9323, Val Acc: 0.2761, Overfitting: 0.6562
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.7528, Val Acc: 0.2782, Overfitting: 0.4746
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.7715, Val Acc: 0.2932, Overfitting: 0.4783
+
+Trial 23 Results:
+  Mean Train Acc: 0.8189
+  Mean Val Acc: 0.2825 (±0.0076)
+  Mean Overfitting: 0.5364 (±0.0847)
+[I 2026-01-11 11:00:58,682] Trial 23 finished with values: [0.28251599147121537, -0.5363758073141375] and parameters: {'batch_size': 8, 'epochs': 30, 'optimizer': 'Adam', 'learning_rate': 0.004427757854348069, 'weight_decay': 7.528562730281471e-06}.
+
+Trial 24:
+  batch_size=64, epochs=20, optimizer=AdamW
+  learning_rate=0.004345, momentum=0.000, weight_decay=0.000025
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.8722, Val Acc: 0.5075, Overfitting: 0.3647
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9438, Val Acc: 0.4361, Overfitting: 0.5077
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.5468, Val Acc: 0.4286, Overfitting: 0.1182
+
+Trial 24 Results:
+  Mean Train Acc: 0.7876
+  Mean Val Acc: 0.4574 (±0.0356)
+  Mean Overfitting: 0.3302 (±0.1609)
+[I 2026-01-11 11:01:40,729] Trial 24 finished with values: [0.4573747802341675, -0.3302309381817224] and parameters: {'batch_size': 64, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.004344908235964725, 'weight_decay': 2.491241726002473e-05}.
+
+Trial 25:
+  batch_size=64, epochs=25, optimizer=AdamW
+  learning_rate=0.000330, momentum=0.000, weight_decay=0.000006
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 1.0000, Val Acc: 0.8060, Overfitting: 0.1940
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.7744, Overfitting: 0.2256
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 1.0000, Val Acc: 0.7744, Overfitting: 0.2256
+
+Trial 25 Results:
+  Mean Train Acc: 1.0000
+  Mean Val Acc: 0.7849 (±0.0149)
+  Mean Overfitting: 0.2151 (±0.0149)
+[I 2026-01-11 11:02:33,538] Trial 25 finished with values: [0.784947443234953, -0.21505255676504695] and parameters: {'batch_size': 64, 'epochs': 25, 'optimizer': 'AdamW', 'learning_rate': 0.00033031496758299274, 'weight_decay': 6.318379795213054e-06}.
+
+Trial 26:
+  batch_size=16, epochs=30, optimizer=SGD
+  learning_rate=0.002756, momentum=0.501, weight_decay=0.000003
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9624, Val Acc: 0.6866, Overfitting: 0.2758
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9663, Val Acc: 0.7594, Overfitting: 0.2069
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.8839, Val Acc: 0.6466, Overfitting: 0.2373
+
+Trial 26 Results:
+  Mean Train Acc: 0.9375
+  Mean Val Acc: 0.6975 (±0.0467)
+  Mean Overfitting: 0.2400 (±0.0282)
+[I 2026-01-11 11:03:20,505] Trial 26 finished with values: [0.6975274005910298, -0.24000369306070254] and parameters: {'batch_size': 16, 'epochs': 30, 'optimizer': 'SGD', 'learning_rate': 0.0027558662734209053, 'weight_decay': 3.4936446007835337e-06, 'momentum': 0.5006365964390437}.
+
+Trial 27:
+  batch_size=32, epochs=20, optimizer=Adam
+  learning_rate=0.006470, momentum=0.000, weight_decay=0.000001
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.8083, Val Acc: 0.5075, Overfitting: 0.3008
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.6255, Val Acc: 0.4436, Overfitting: 0.1819
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.7790, Val Acc: 0.4361, Overfitting: 0.3429
+
+Trial 27 Results:
+  Mean Train Acc: 0.7376
+  Mean Val Acc: 0.4624 (±0.0320)
+  Mean Overfitting: 0.2752 (±0.0682)
+[I 2026-01-11 11:03:53,180] Trial 27 finished with values: [0.46238731156248836, -0.27520104134224543] and parameters: {'batch_size': 32, 'epochs': 20, 'optimizer': 'Adam', 'learning_rate': 0.006469593595767098, 'weight_decay': 1.0667799013471056e-06}.
+
+Trial 28:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000082, momentum=0.000, weight_decay=0.000017
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9962, Val Acc: 0.8955, Overfitting: 0.1007
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9700, Val Acc: 0.8271, Overfitting: 0.1430
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9925, Val Acc: 0.7594, Overfitting: 0.2331
+
+Trial 28 Results:
+  Mean Train Acc: 0.9863
+  Mean Val Acc: 0.8273 (±0.0556)
+  Mean Overfitting: 0.1589 (±0.0552)
+[I 2026-01-11 11:04:29,147] Trial 28 finished with values: [0.8273295178244119, -0.1589329548366416] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 8.230704658513187e-05, 'weight_decay': 1.6754970573770607e-05}.
+
+Trial 29:
+  batch_size=16, epochs=15, optimizer=AdamW
+  learning_rate=0.000077, momentum=0.000, weight_decay=0.000017
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9887, Val Acc: 0.6791, Overfitting: 0.3096
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9813, Val Acc: 0.5414, Overfitting: 0.4399
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9963, Val Acc: 0.6992, Overfitting: 0.2970
+
+Trial 29 Results:
+  Mean Train Acc: 0.9887
+  Mean Val Acc: 0.6399 (±0.0702)
+  Mean Overfitting: 0.3488 (±0.0646)
+[I 2026-01-11 11:04:52,486] Trial 29 finished with values: [0.6399019937904463, -0.34884797100919335] and parameters: {'batch_size': 16, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 7.680027378568368e-05, 'weight_decay': 1.7388552747710355e-05}.
+
+Trial 30:
+  batch_size=16, epochs=15, optimizer=AdamW
+  learning_rate=0.000193, momentum=0.000, weight_decay=0.000500
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9962, Val Acc: 0.8881, Overfitting: 0.1082
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.6692, Overfitting: 0.3308
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9963, Val Acc: 0.7744, Overfitting: 0.2218
+
+Trial 30 Results:
+  Mean Train Acc: 0.9975
+  Mean Val Acc: 0.7772 (±0.0894)
+  Mean Overfitting: 0.2203 (±0.0909)
+[I 2026-01-11 11:05:17,239] Trial 30 finished with values: [0.7772229080163094, -0.2202755197009237] and parameters: {'batch_size': 16, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 0.00019288862012129874, 'weight_decay': 0.0005000624866321088}.
+
+Trial 31:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000175, momentum=0.000, weight_decay=0.000015
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9850, Val Acc: 0.8806, Overfitting: 0.1044
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.8346, Overfitting: 0.1654
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9963, Val Acc: 0.8496, Overfitting: 0.1466
+
+Trial 31 Results:
+  Mean Train Acc: 0.9937
+  Mean Val Acc: 0.8549 (±0.0192)
+  Mean Overfitting: 0.1388 (±0.0255)
+[I 2026-01-11 11:05:53,752] Trial 31 finished with values: [0.8549358470803875, -0.13880318214060502] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.00017528114829507333, 'weight_decay': 1.538582021694407e-05}.
+
+Trial 32:
+  batch_size=64, epochs=25, optimizer=AdamW
+  learning_rate=0.006002, momentum=0.000, weight_decay=0.000063
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.3872, Val Acc: 0.5075, Overfitting: -0.1202
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.4419, Val Acc: 0.4511, Overfitting: -0.0092
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.8764, Val Acc: 0.6391, Overfitting: 0.2373
+
+Trial 32 Results:
+  Mean Train Acc: 0.5685
+  Mean Val Acc: 0.5326 (±0.0788)
+  Mean Overfitting: 0.0360 (±0.1494)
+[I 2026-01-11 11:06:46,032] Trial 32 finished with values: [0.5325627501589795, -0.03596061818697901] and parameters: {'batch_size': 64, 'epochs': 25, 'optimizer': 'AdamW', 'learning_rate': 0.006001678242884747, 'weight_decay': 6.311886531518638e-05}.
+
+Trial 33:
+  batch_size=64, epochs=20, optimizer=AdamW
+  learning_rate=0.001012, momentum=0.000, weight_decay=0.000064
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.3496, Val Acc: 0.6493, Overfitting: -0.2996
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.6917, Overfitting: 0.3083
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.4157, Val Acc: 0.6692, Overfitting: -0.2534
+
+Trial 33 Results:
+  Mean Train Acc: 0.5885
+  Mean Val Acc: 0.6701 (±0.0174)
+  Mean Overfitting: -0.0816 (±0.2763)
+[I 2026-01-11 11:07:27,861] Trial 33 finished with values: [0.6700519956607938, 0.08160052991778455] and parameters: {'batch_size': 64, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0010115794990884336, 'weight_decay': 6.417190782320931e-05}.
+
+Trial 34:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.001005, momentum=0.000, weight_decay=0.000219
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9511, Val Acc: 0.8433, Overfitting: 0.1078
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.6479, Val Acc: 0.7744, Overfitting: -0.1265
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.5993, Val Acc: 0.6992, Overfitting: -0.1000
+
+Trial 34 Results:
+  Mean Train Acc: 0.7328
+  Mean Val Acc: 0.7723 (±0.0588)
+  Mean Overfitting: -0.0395 (±0.1048)
+[I 2026-01-11 11:08:04,441] Trial 34 finished with values: [0.7723225975386226, 0.03954965394368026] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0010053707605371044, 'weight_decay': 0.0002193566409866228}.
+
+Trial 35:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000892, momentum=0.000, weight_decay=0.000227
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9586, Val Acc: 0.8134, Overfitting: 0.1452
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9476, Val Acc: 0.7143, Overfitting: 0.2333
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.5506, Val Acc: 0.6692, Overfitting: -0.1186
+
+Trial 35 Results:
+  Mean Train Acc: 0.8189
+  Mean Val Acc: 0.7323 (±0.0603)
+  Mean Overfitting: 0.0866 (±0.1495)
+[I 2026-01-11 11:08:40,751] Trial 35 finished with values: [0.7322971608124789, -0.08662749164262884] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0008919230819971856, 'weight_decay': 0.0002270085407015008}.
+
+Trial 36:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000447, momentum=0.000, weight_decay=0.000886
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9586, Val Acc: 0.8284, Overfitting: 0.1303
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9775, Val Acc: 0.7218, Overfitting: 0.2557
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9476, Val Acc: 0.8647, Overfitting: 0.0829
+
+Trial 36 Results:
+  Mean Train Acc: 0.9612
+  Mean Val Acc: 0.8049 (±0.0606)
+  Mean Overfitting: 0.1563 (±0.0729)
+[I 2026-01-11 11:09:17,419] Trial 36 finished with values: [0.8049414581229192, -0.15630529171046573] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.00044748117887604164, 'weight_decay': 0.0008857120153204328}.
+
+Trial 37:
+  batch_size=8, epochs=20, optimizer=Adam
+  learning_rate=0.000181, momentum=0.000, weight_decay=0.000044
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9887, Val Acc: 0.8955, Overfitting: 0.0932
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9963, Val Acc: 0.8346, Overfitting: 0.1617
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9850, Val Acc: 0.7820, Overfitting: 0.2031
+
+Trial 37 Results:
+  Mean Train Acc: 0.9900
+  Mean Val Acc: 0.8374 (±0.0464)
+  Mean Overfitting: 0.1526 (±0.0453)
+[I 2026-01-11 11:09:54,758] Trial 37 finished with values: [0.8373545804810534, -0.1526438237692728] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'Adam', 'learning_rate': 0.0001814170727733095, 'weight_decay': 4.428590833595119e-05}.
+
+Trial 38:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000285, momentum=0.000, weight_decay=0.000089
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9812, Val Acc: 0.8881, Overfitting: 0.0931
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9888, Val Acc: 0.8797, Overfitting: 0.1091
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9700, Val Acc: 0.8496, Overfitting: 0.1204
+
+Trial 38 Results:
+  Mean Train Acc: 0.9800
+  Mean Val Acc: 0.8725 (±0.0165)
+  Mean Overfitting: 0.1075 (±0.0112)
+[I 2026-01-11 11:10:31,584] Trial 38 finished with values: [0.8724610032544047, -0.10754049862764126] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0002847453902902796, 'weight_decay': 8.870445015199785e-05}.
+
+Trial 39:
+  batch_size=8, epochs=25, optimizer=AdamW
+  learning_rate=0.000295, momentum=0.000, weight_decay=0.000091
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9812, Val Acc: 0.8806, Overfitting: 0.1006
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9888, Val Acc: 0.7895, Overfitting: 0.1993
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9925, Val Acc: 0.8797, Overfitting: 0.1128
+
+Trial 39 Results:
+  Mean Train Acc: 0.9875
+  Mean Val Acc: 0.8499 (±0.0427)
+  Mean Overfitting: 0.1376 (±0.0439)
+[I 2026-01-11 11:11:17,403] Trial 39 finished with values: [0.8499233157520667, -0.13756882283409902] and parameters: {'batch_size': 8, 'epochs': 25, 'optimizer': 'AdamW', 'learning_rate': 0.00029461426092931647, 'weight_decay': 9.096171789538192e-05}.
+
+Trial 40:
+  batch_size=8, epochs=25, optimizer=AdamW
+  learning_rate=0.001095, momentum=0.000, weight_decay=0.000062
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9248, Val Acc: 0.7239, Overfitting: 0.2009
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9213, Val Acc: 0.8120, Overfitting: 0.1093
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9176, Val Acc: 0.8271, Overfitting: 0.0905
+
+Trial 40 Results:
+  Mean Train Acc: 0.9213
+  Mean Val Acc: 0.7877 (±0.0455)
+  Mean Overfitting: 0.1336 (±0.0482)
+[I 2026-01-11 11:12:03,660] Trial 40 finished with values: [0.7876594471252759, -0.13359499985359458] and parameters: {'batch_size': 8, 'epochs': 25, 'optimizer': 'AdamW', 'learning_rate': 0.001095437572993891, 'weight_decay': 6.176703484283876e-05}.
+
+Trial 41:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000839, momentum=0.000, weight_decay=0.000309
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9586, Val Acc: 0.7463, Overfitting: 0.2124
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9101, Val Acc: 0.8271, Overfitting: 0.0830
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9326, Val Acc: 0.7143, Overfitting: 0.2183
+
+Trial 41 Results:
+  Mean Train Acc: 0.9338
+  Mean Val Acc: 0.7625 (±0.0475)
+  Mean Overfitting: 0.1712 (±0.0624)
+[I 2026-01-11 11:12:40,211] Trial 41 finished with values: [0.7625406800583548, -0.17124040185992398] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0008388670271581841, 'weight_decay': 0.0003088997235034282}.
+
+Trial 42:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.002254, momentum=0.000, weight_decay=0.000243
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.7669, Val Acc: 0.4478, Overfitting: 0.3192
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.7715, Val Acc: 0.4361, Overfitting: 0.3354
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.7528, Val Acc: 0.5940, Overfitting: 0.1588
+
+Trial 42 Results:
+  Mean Train Acc: 0.7638
+  Mean Val Acc: 0.4926 (±0.0718)
+  Mean Overfitting: 0.2711 (±0.0797)
+[I 2026-01-11 11:13:16,796] Trial 42 finished with values: [0.4926121273332586, -0.2711418268405655] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.00225425291992072, 'weight_decay': 0.000243261502222224}.
+
+Trial 43:
+  batch_size=8, epochs=25, optimizer=SGD
+  learning_rate=0.000527, momentum=0.094, weight_decay=0.000502
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.7481, Val Acc: 0.7537, Overfitting: -0.0056
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.7416, Val Acc: 0.5414, Overfitting: 0.2002
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.7266, Val Acc: 0.6692, Overfitting: 0.0574
+
+Trial 43 Results:
+  Mean Train Acc: 0.7388
+  Mean Val Acc: 0.6548 (±0.0873)
+  Mean Overfitting: 0.0840 (±0.0861)
+[I 2026-01-11 11:14:01,821] Trial 43 finished with values: [0.654752553024352, -0.08400914522877156] and parameters: {'batch_size': 8, 'epochs': 25, 'optimizer': 'SGD', 'learning_rate': 0.0005271187307147522, 'weight_decay': 0.0005016362181433012, 'momentum': 0.09437597330985459}.
+
+Trial 44:
+  batch_size=8, epochs=20, optimizer=Adam
+  learning_rate=0.000049, momentum=0.000, weight_decay=0.000066
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9699, Val Acc: 0.7985, Overfitting: 0.1714
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9738, Val Acc: 0.7068, Overfitting: 0.2670
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9850, Val Acc: 0.8647, Overfitting: 0.1204
+
+Trial 44 Results:
+  Mean Train Acc: 0.9762
+  Mean Val Acc: 0.7900 (±0.0647)
+  Mean Overfitting: 0.1863 (±0.0608)
+[I 2026-01-11 11:14:38,640] Trial 44 finished with values: [0.7899786780383794, -0.18626342534742582] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'Adam', 'learning_rate': 4.878972598565303e-05, 'weight_decay': 6.567449497830908e-05}.
+
+Trial 45:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000318, momentum=0.000, weight_decay=0.000143
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9737, Val Acc: 0.8806, Overfitting: 0.0931
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9963, Val Acc: 0.8346, Overfitting: 0.1617
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9813, Val Acc: 0.8421, Overfitting: 0.1392
+
+Trial 45 Results:
+  Mean Train Acc: 0.9837
+  Mean Val Acc: 0.8524 (±0.0202)
+  Mean Overfitting: 0.1313 (±0.0285)
+[I 2026-01-11 11:15:15,276] Trial 45 finished with values: [0.852429581416227, -0.13130785205509163] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0003179509482596275, 'weight_decay': 0.00014318157580553033}.
+
+Trial 46:
+  batch_size=32, epochs=15, optimizer=SGD
+  learning_rate=0.000990, momentum=0.754, weight_decay=0.000034
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.8609, Val Acc: 0.6642, Overfitting: 0.1967
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.8839, Val Acc: 0.6466, Overfitting: 0.2373
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.8165, Val Acc: 0.6842, Overfitting: 0.1323
+
+Trial 46 Results:
+  Mean Train Acc: 0.8538
+  Mean Val Acc: 0.6650 (±0.0154)
+  Mean Overfitting: 0.1888 (±0.0432)
+[I 2026-01-11 11:15:40,211] Trial 46 finished with values: [0.6650020573822616, -0.18875687177583964] and parameters: {'batch_size': 32, 'epochs': 15, 'optimizer': 'SGD', 'learning_rate': 0.000989548434700703, 'weight_decay': 3.398414547998713e-05, 'momentum': 0.7536932517494245}.
+
+Trial 47:
+  batch_size=8, epochs=20, optimizer=AdamW
+  learning_rate=0.000612, momentum=0.000, weight_decay=0.009862
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9586, Val Acc: 0.8134, Overfitting: 0.1452
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9850, Val Acc: 0.7368, Overfitting: 0.2482
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9551, Val Acc: 0.8496, Overfitting: 0.1054
+
+Trial 47 Results:
+  Mean Train Acc: 0.9662
+  Mean Val Acc: 0.8000 (±0.0470)
+  Mean Overfitting: 0.1663 (±0.0601)
+[I 2026-01-11 11:16:16,947] Trial 47 finished with values: [0.7999663337448096, -0.16627417389132174] and parameters: {'batch_size': 8, 'epochs': 20, 'optimizer': 'AdamW', 'learning_rate': 0.0006120507027821605, 'weight_decay': 0.009862493958893052}.
+
+Trial 48:
+  batch_size=16, epochs=30, optimizer=Adam
+  learning_rate=0.000015, momentum=0.000, weight_decay=0.000116
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9549, Val Acc: 0.7164, Overfitting: 0.2385
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 0.9663, Val Acc: 0.6241, Overfitting: 0.3422
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 0.9401, Val Acc: 0.7820, Overfitting: 0.1581
+
+Trial 48 Results:
+  Mean Train Acc: 0.9538
+  Mean Val Acc: 0.7075 (±0.0648)
+  Mean Overfitting: 0.2463 (±0.0754)
+[I 2026-01-11 11:17:04,705] Trial 48 finished with values: [0.7074776493472488, -0.24627377040062284] and parameters: {'batch_size': 16, 'epochs': 30, 'optimizer': 'Adam', 'learning_rate': 1.4580153270206088e-05, 'weight_decay': 0.0001155150110004811}.
+
+Trial 49:
+  batch_size=64, epochs=15, optimizer=AdamW
+  learning_rate=0.001559, momentum=0.000, weight_decay=0.001527
+
+  Fold 1/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 1 - Train Acc: 0.9850, Val Acc: 0.5224, Overfitting: 0.4626
+
+  Fold 2/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 2 - Train Acc: 1.0000, Val Acc: 0.7519, Overfitting: 0.2481
+
+  Fold 3/3
+MODEL SETUP - Unfrozen backbone blocks: 10 → 16
+  Fold 3 - Train Acc: 1.0000, Val Acc: 0.7143, Overfitting: 0.2857
+
+Trial 49 Results:
+  Mean Train Acc: 0.9950
+  Mean Val Acc: 0.6629 (±0.1005)
+  Mean Overfitting: 0.3321 (±0.0935)
+[I 2026-01-11 11:17:36,504] Trial 49 finished with values: [0.6628511577451089, -0.3321363109265702] and parameters: {'batch_size': 64, 'epochs': 15, 'optimizer': 'AdamW', 'learning_rate': 0.0015593589380136406, 'weight_decay': 0.0015268318707187423}.
+
+======================================================================
+OPTIMIZATION COMPLETE
+======================================================================
+
+Number of trials: 50
+Number of Pareto optimal solutions: 3
+
+Pareto Front (Top 5 solutions):
+
+  Trial 33:
+    Val Accuracy: 0.6701
+    Overfitting: -0.0816
+    Hyperparameters:
+      batch_size: 64
+      epochs: 20
+      optimizer: AdamW
+      learning_rate: 0.0010115794990884336
+      weight_decay: 6.417190782320931e-05
+
+  Trial 34:
+    Val Accuracy: 0.7723
+    Overfitting: -0.0395
+    Hyperparameters:
+      batch_size: 8
+      epochs: 20
+      optimizer: AdamW
+      learning_rate: 0.0010053707605371044
+      weight_decay: 0.0002193566409866228
+
+  Trial 38:
+    Val Accuracy: 0.8725
+    Overfitting: 0.1075
+    Hyperparameters:
+      batch_size: 8
+      epochs: 20
+      optimizer: AdamW
+      learning_rate: 0.0002847453902902796
+      weight_decay: 8.870445015199785e-05
+
+Results saved to:
+  - /data/uabmcv2526/mcvstudent29/output/hyperopt/pareto_front_results.txt (text format)
+  - /data/uabmcv2526/mcvstudent29/output/hyperopt/pareto_front.json (JSON format)
+  - /data/uabmcv2526/mcvstudent29/output/hyperopt/recommended_configs.json (recommended configs)
+
+RECOMMENDED CONFIGURATIONS:
+
+1. Best Accuracy (Trial 38):
+   Val Acc: 0.8725, Overfitting: 0.1075
+   batch_size: 8
+   epochs: 20
+   optimizer: AdamW
+   learning_rate: 0.0002847453902902796
+   weight_decay: 8.870445015199785e-05
+
+2. Lowest Overfitting (Trial 33):
+   Val Acc: 0.6701, Overfitting: -0.0816
+   batch_size: 64
+   epochs: 20
+   optimizer: AdamW
+   learning_rate: 0.0010115794990884336
+   weight_decay: 6.417190782320931e-05
+
+3. RECOMMENDED - Best Balance (Trial 34):
+   Val Acc: 0.7723, Overfitting: -0.0395
+   batch_size: 8
+   epochs: 20
+   optimizer: AdamW
+   learning_rate: 0.0010053707605371044
+   weight_decay: 0.0002193566409866228
+Could not save visualization plots: Tried to import 'plotly' but failed. Please make sure that the package is installed correctly to use this feature. Actual error: No module named 'plotly'.
+
+hyperopt_week3_mcvstudent29_1848944Optimization complete!
+Hyperparameter optimization complete!
+Date: Sun Jan 11 11:17:40 CET 2026
