@@ -19,6 +19,7 @@ echo "Current directory: $(pwd)"
 
 # ------------------ ENV SETUP ------------------
 module load conda
+conda activate mydl
 
 export WANDB_MODE=offline
 export WANDB_DIR=/data/uabmcv2526/mcvstudent29/wandb/hyperopt
