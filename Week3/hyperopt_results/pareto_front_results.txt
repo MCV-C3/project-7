@@ -1,0 +1,37 @@
+Multi-Objective Optimization Results
+Number of trials: 50
+Number of Pareto optimal solutions: 3
+
+Pareto Front Solutions:
+======================================================================
+
+Solution 1 (Trial 33):
+  Val Accuracy: 0.6701
+  Overfitting: -0.0816
+  Hyperparameters:
+    batch_size: 64
+    epochs: 20
+    optimizer: AdamW
+    learning_rate: 0.0010115794990884336
+    weight_decay: 6.417190782320931e-05
+
+Solution 2 (Trial 34):
+  Val Accuracy: 0.7723
+  Overfitting: -0.0395
+  Hyperparameters:
+    batch_size: 8
+    epochs: 20
+    optimizer: AdamW
+    learning_rate: 0.0010053707605371044
+    weight_decay: 0.0002193566409866228
+
+Solution 3 (Trial 38):
+  Val Accuracy: 0.8725
+  Overfitting: 0.1075
+  Hyperparameters:
+    batch_size: 8
+    epochs: 20
+    optimizer: AdamW
+    learning_rate: 0.0002847453902902796
+    weight_decay: 8.870445015199785e-05
+

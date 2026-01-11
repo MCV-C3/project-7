@@ -1,0 +1,41 @@
+{
+  "best_accuracy": {
+    "trial_number": 38,
+    "val_accuracy": 0.8724610032544047,
+    "overfitting": 0.10754049862764126,
+    "hyperparameters": {
+      "batch_size": 8,
+      "epochs": 20,
+      "optimizer": "AdamW",
+      "learning_rate": 0.0002847453902902796,
+      "weight_decay": 8.870445015199785e-05
+    },
+    "description": "Highest validation accuracy (may have more overfitting)"
+  },
+  "best_overfitting": {
+    "trial_number": 33,
+    "val_accuracy": 0.6700519956607938,
+    "overfitting": -0.08160052991778455,
+    "hyperparameters": {
+      "batch_size": 64,
+      "epochs": 20,
+      "optimizer": "AdamW",
+      "learning_rate": 0.0010115794990884336,
+      "weight_decay": 6.417190782320931e-05
+    },
+    "description": "Lowest overfitting (may have lower accuracy)"
+  },
+  "recommended_balanced": {
+    "trial_number": 34,
+    "val_accuracy": 0.7723225975386226,
+    "overfitting": -0.03954965394368026,
+    "hyperparameters": {
+      "batch_size": 8,
+      "epochs": 20,
+      "optimizer": "AdamW",
+      "learning_rate": 0.0010053707605371044,
+      "weight_decay": 0.0002193566409866228
+    },
+    "description": "Best balance between accuracy and overfitting"
+  }
+}
