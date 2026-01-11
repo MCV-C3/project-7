@@ -404,6 +404,10 @@ if __name__ == "__main__":
 
     train_losses, train_accuracies = [], []
     test_losses, test_accuracies = [], []
+    
+    # Track best validation accuracy and save best model
+    best_val_acc = 0.0
+    best_epoch = 0
 
     for epoch in tqdm.tqdm(range(num_epochs), desc="TRAINING THE MODEL"):
         # # Collect all inverted residual blocks in a fixed order
@@ -460,16 +464,24 @@ if __name__ == "__main__":
               f"Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.4f}, "
               f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
 
+        # Save best model based on validation accuracy
+        if test_accuracy > best_val_acc:
+            best_val_acc = test_accuracy
+            best_epoch = epoch + 1
+            model_path = .join(OUTPUT_PATH, "saved_model.pt")
+            torch.save(model.state_dict(), model_path)
+            print(f"  → New best model saved! Val Acc: {best_val_acc:.4f}")
+
         wandb.log({
             "epoch": epoch + 1,
             "train_loss": train_loss,
             "train_accuracy": train_accuracy,
             "test_loss": test_loss,
             "test_accuracy": test_accuracy,
+            "best_val_acc": best_val_acc,
         })
-        
-    model_path = os.path.join(OUTPUT_PATH, "saved_model.pt")
-    torch.save(model.state_dict(), model_path)
+    
+    print(f"\nTraining complete! Best validation accuracy: {best_val_acc:.4f} at epoch {best_epoch}")
 
     # Plot results
     plot_metrics({"loss": train_losses, "accuracy": train_accuracies}, {"loss": test_losses, "accuracy": test_accuracies}, "loss", OUTPUT_DIR=OUTPUT_PATH)
