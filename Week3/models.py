@@ -237,7 +237,8 @@ class WraperModel(nn.Module):
 def build_transforms(use_flip: bool = False,
                      use_color: bool = False,
                      use_geometric: bool = False,
-                     use_translation: bool = False) -> F.Compose:
+                     use_translation: bool = False,
+                     aug_ratio: float = 1.0) -> F.Compose:
     transforms = [
             F.ToImage(),
             F.ToDtype(torch.float32, scale=True),
@@ -246,31 +247,37 @@ def build_transforms(use_flip: bool = False,
     
     if use_flip:
         transforms += [
-            F.RandomHorizontalFlip(p=0.5)
+            F.RandomHorizontalFlip(p=0.5 * aug_ratio)
         ]
     if use_color:
         transforms += [
-            F.ColorJitter(
-                brightness=0.2,   # + - 20%
-                contrast=0.2,
-                saturation=0.2,
-                hue=0.05
-            )
+            F.RandomApply([
+                F.ColorJitter(
+                    brightness=0.2,   # + - 20%
+                    contrast=0.2,
+                    saturation=0.2,
+                    hue=0.05
+                )
+            ], p=aug_ratio)
         ]
     if use_geometric:
         transforms += [
-            F.RandomAffine(
-                degrees=10,          # rotation + - 10°
-                scale=(0.9, 1.1),    # zoom in/out
-                shear=5              # shear + - 5°
-            )
+            F.RandomApply([
+                F.RandomAffine(
+                    degrees=10,          # rotation + - 10°
+                    scale=(0.9, 1.1),    # zoom in/out
+                    shear=5              # shear + - 5°
+                )
+            ], p=aug_ratio)
         ]
     if use_translation:
         transforms += [
-            F.RandomAffine(
-                degrees=0,           # no rotation
-                translate=(0.1, 0.1) # + - 10% width/height
-            )
+            F.RandomApply([
+                F.RandomAffine(
+                    degrees=0,           # no rotation
+                    translate=(0.1, 0.1) # + - 10% width/height
+                )
+            ], p=aug_ratio)
         ]
 
     return F.Compose(transforms)

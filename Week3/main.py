@@ -347,7 +347,8 @@ if __name__ == "__main__":
             use_flip=(args.aug_type == "flip"),
             use_color=(args.aug_type == "color"),
             use_geometric=(args.aug_type == "geometric"),
-            use_translation=(args.aug_type == "translation")
+            use_translation=(args.aug_type == "translation"),
+            aug_ratio=args.aug_ratio
         )
     
     data_train = ImageFolder(root=os.path.join(DATASET_ROOT, 'train'), transform=train_transformation)
