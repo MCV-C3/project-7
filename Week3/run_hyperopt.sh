@@ -9,7 +9,7 @@
 
 # Hyperparameter Optimization with Optuna
 # This script runs hyperparameter optimization using 3-fold cross-validation
-# Fixed parameters: --unfreeze_blocks 7, use_batchnorm_blocks=True
+# Fixed parameters: --unfreeze_blocks 7
 # Optimized parameters: batch_size, epochs, optimizer, learning_rate, momentum, weight_decay
 
 echo "Starting hyperparameter optimization..."
