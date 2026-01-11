@@ -1,12 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=hyperopt_week3
-#SBATCH --ntasks=4
-#SBATCH --mem=16GB
-#SBATCH --partition=gpu
+#SBATCH -p gpu
 #SBATCH --gres=gpu:1
-#SBATCH --time=24:00:00
-#SBATCH --output=hyperopt_%j.out
-#SBATCH --error=hyperopt_%j.err
+#SBATCH --mem=16GB
+#SBATCH -o /data/uabmcv2526/mcvstudent29/logs/%x_%u_%j.out
+#SBATCH -e /data/uabmcv2526/mcvstudent29/logs/%x_%u_%j.err
+#SBATCH -t 1-00:00
 
 # Hyperparameter Optimization with Optuna
 # This script runs hyperparameter optimization using 3-fold cross-validation
@@ -20,10 +19,15 @@ echo "Current directory: $(pwd)"
 
 # ------------------ ENV SETUP ------------------
 module load conda
-conda activate mydl
 
-# Activate virtual environment (if using one)
-# source /path/to/your/venv/bin/activate
+export WANDB_MODE=offline
+export WANDB_DIR=/data/uabmcv2526/mcvstudent29/wandb/hyperopt
+
+cd /home/mcvstudent29/Week3
+
+# Clear Python cache to ensure latest code is used
+find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+find . -type f -name '*.pyc' -delete 2>/dev/null || true
 
 # Run hyperparameter optimization
 python hyperparameter_optimization.py \

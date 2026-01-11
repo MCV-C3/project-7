@@ -11,7 +11,6 @@ This script optimizes the following hyperparameters:
 
 Fixed parameters (from previous experiments):
 - unfreeze_blocks = 7
-- use_batchnorm_blocks = True
 
 Multi-objective optimization:
 1. Maximize validation accuracy (from best epoch, not final epoch)
@@ -205,7 +204,7 @@ def cross_validate(
             unfreeze_blocks=7,
             dropout_blocks=0,
             dropout_value=0.5,
-            use_batchnorm_blocks=True
+            use_batchnorm_blocks=False
         )
         model = model.to(device)
         
@@ -258,12 +257,7 @@ def cross_validate(
                 final_val_acc = val_acc
                 final_val_loss = val_loss
             
-            # Report intermediate value for pruning
-            trial.report(val_acc, fold * epochs + epoch)
-            
-            # Check if trial should be pruned
-            if trial.should_prune():
-                raise optuna.TrialPruned()
+            # Note: Trial pruning not supported for multi-objective optimization
         
         # Store fold results
         fold_train_accs.append(final_train_acc)
@@ -424,20 +418,17 @@ def main():
             'n_trials': args.n_trials,
             'n_folds': 3,
             'unfreeze_blocks': 7,
-            'use_batchnorm_blocks': True
+            'use_batchnorm_blocks': False
         }
     )
     
     # Create Optuna study for multi-objective optimization
     # Using TPE (Tree-structured Parzen Estimator) sampler for efficient hyperparameter search
+    # Note: Pruners are not used in multi-objective optimization
     study = optuna.create_study(
         study_name=args.study_name,
         directions=['maximize', 'maximize'],  # Maximize val_acc, maximize -overfitting (i.e., minimize overfitting)
-        sampler=optuna.samplers.TPESampler(seed=42),  # TPE sampler with fixed seed
-        pruner=optuna.pruners.MedianPruner(
-            n_startup_trials=5,
-            n_warmup_steps=10
-        )
+        sampler=optuna.samplers.TPESampler(seed=42)  # TPE sampler with fixed seed
     )
     
     print(f"\nStarting Optuna optimization with {args.n_trials} trials...")
