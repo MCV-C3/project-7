@@ -11,7 +11,7 @@ import wandb
 from datetime import datetime
 
 from models import SimpleCNN, build_transforms
-from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix
+from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 
 
 def train_epoch(model, dataloader, criterion, optimizer, device):
@@ -117,20 +117,26 @@ def main(args):
     
     # Create output directory with timestamp to avoid overwriting
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir_name = f"{args.experiment_name}_{timestamp}" if args.add_timestamp else args.experiment_name
-    output_dir = os.path.join(args.output_dir, output_dir_name)
+    
+    # Create experiment folder, then timestamped subfolder inside
+    experiment_folder = os.path.join(args.output_dir, args.experiment_name)
+    output_dir = os.path.join(experiment_folder, f"{args.experiment_name}_{timestamp}")
     os.makedirs(output_dir, exist_ok=True)
     
     print("\n" + "=" * 70)
     print("WEEK 4 - CNN FROM SCRATCH TRAINING")
     print("=" * 70)
-    print(f"Experiment: {output_dir_name}")
+    print(f"Experiment: {args.experiment_name}")
+    print(f"Run subfolder: {args.experiment_name}_{timestamp}")
     print(f"Output directory: {output_dir}")
     print(f"Random seed: {args.seed}")
     print("=" * 70 + "\n")
     
-    # Initialize wandb
+    # Initialize wandb with custom ID that includes experiment name and timestamp
+    timestamp_short = datetime.now().strftime("%H%M%S")
+    wandb_run_id = f"{args.experiment_name}_{timestamp_short}_{wandb.util.generate_id()}"
     wandb.init(
+        id=wandb_run_id,
         project=args.wandb_project,
         name=args.experiment_name,
         config={
@@ -214,6 +220,9 @@ def main(args):
     
     # Save architecture summary to file
     save_model_architecture(model, output_dir, input_size=(1, input_channels, 224, 224))
+    
+    # Save architecture diagram (visual)
+    save_architecture_diagram(model, output_dir, input_size=(1, input_channels, 224, 224))
     
     # Define loss function
     criterion = nn.CrossEntropyLoss()
@@ -361,6 +370,7 @@ def main(args):
     print(f"Directory: {output_dir}")
     print(f"  - best_model.pt")
     print(f"  - architecture_summary.txt")
+    print(f"  - architecture_diagram.png")
     print(f"  - confusion_matrix.png")
     print(f"  - per_class_accuracy.txt")
     print(f"  - loss.png")
@@ -441,12 +451,7 @@ if __name__ == "__main__":
         "--experiment_name",
         type=str,
         default="baseline_cnn",
-        help="Name of the experiment"
-    )
-    parser.add_argument(
-        "--add_timestamp",
-        action="store_true",
-        help="Add timestamp to experiment name to avoid overwriting previous runs"
+        help="Name of the experiment (timestamp will be automatically added to each run)"
     )
     parser.add_argument(
         "--wandb_project",

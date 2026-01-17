@@ -15,10 +15,11 @@ All Week4 files are now organized under `/data/uabmcv2526/mcvstudent29/Week4/`:
 │
 ├── output/                         # Training outputs
 │   └── first_run/                  # experiment_name subfolder
-│       ├── best_model.pt           # Best model checkpoint
-│       ├── loss.png                # Loss curves plot
-│       ├── accuracy.png            # Accuracy curves plot
-│       └── training_summary.txt    # Training configuration & results
+│       └── first_run_timestamp/    # experiment_name + timestamp subfolder
+│          ├── best_model.pt           # Best model checkpoint
+│          ├── loss.png                # Loss curves plot
+│          ├── accuracy.png            # Accuracy curves plot
+│          └── training_summary.txt    # Training configuration & results
 │
 └── wandb/                          # Wandb offline logs
     └── offline-run-XXXXX/

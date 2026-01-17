@@ -4,6 +4,7 @@ import numpy as np
 import os
 from typing import Dict
 import torch
+from torchview import draw_graph
 
 
 def plot_metrics(train_metrics: Dict, test_metrics: Dict, metric_name: str, output_dir: str = "./"):
@@ -221,3 +222,39 @@ def plot_confusion_matrix(y_true, y_pred, class_names, output_dir: str):
         f.write("=" * 50 + "\n")
     
     print(f"Per-class accuracy saved to {acc_path}")
+
+
+def save_architecture_diagram(model, output_dir: str, input_size=(1, 3, 224, 224)):
+    """
+    Generate and save a visual diagram of the model architecture.
+    
+    Args:
+        model: PyTorch model
+        output_dir: Directory to save the diagram
+        input_size: Size of input tensor
+    """
+    try:
+        # Generate architecture graph
+        model_graph = draw_graph(
+            model, 
+            input_size=input_size,
+            expand_nested=True,
+            graph_dir='TB',  # Top to bottom
+            hide_inner_tensors=True,
+            hide_module_functions=True,
+            roll=True
+        )
+        
+        # Save as PNG
+        arch_diagram_path = os.path.join(output_dir, "architecture_diagram")
+        model_graph.visual_graph.render(
+            filename=arch_diagram_path,
+            format='png',
+            cleanup=True  # Remove the intermediate dot file
+        )
+        
+        print(f"Architecture diagram saved to {arch_diagram_path}.png")
+        
+    except Exception as e:
+        print(f"Could not generate architecture diagram: {e}")
+        print("You may need to install: pip install torchview graphviz")

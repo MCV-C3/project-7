@@ -19,12 +19,11 @@ export WANDB_DIR=/data/uabmcv2526/mcvstudent29/Week4/wandb
 cd /home/mcvstudent29/Week4
 
 # Run training with baseline configuration
-# Add --add_timestamp flag to automatically append timestamp and avoid overwriting
+# Output structure: output/first_run/first_run_20260117_180544/
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output \
     --experiment_name first_run \
-    --add_timestamp \
     --wandb_project C3_Week4 \
     --batch_size 16 \
     --epochs 20 \

@@ -13,19 +13,19 @@ ENV/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# PyTorch
-*.pth
-*.pt
+# PyTorch models (but keep them in output folder for now)
+# *.pth
+# *.pt
 
-# Wandb
-wandb/
+# Wandb (keep for Week4)
+# wandb/
 *.wandb
 
-# Output files
-output/
-*.png
-*.jpg
-*.jpeg
+# Output files (keep output folder but ignore images)
+# output/
+# *.png
+# *.jpg
+# *.jpeg
 
 # Logs
 *.log

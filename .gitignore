@@ -1,5 +1,15 @@
-output/
-wandb/
+# Ignore output and wandb in all Week folders
+Week*/output/
+Week*/wandb/
+
+# EXCEPT keep Week4's folders
+# !Week4/output/
+# !Week4/wandb/
+
+# Ignore output and wandb at root level if any
+/output/
+/wandb/
+
 data/
 /.venv
 **/__pycache__/
