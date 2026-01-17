@@ -1,7 +1,8 @@
 output/
 wandb/
+data/
 /.venv
 **/__pycache__/
 Week*/**/__pycache__/
-*.pyc   ´
+*.pyc
 .DS_Store
