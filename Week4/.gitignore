@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyTorch
+*.pth
+*.pt
+
+# Wandb
+wandb/
+*.wandb
+
+# Output files
+output/
+*.png
+*.jpg
+*.jpeg
+
+# Logs
+*.log
+*.out
+*.err
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data (if accidentally copied here)
+data/
+MIT_split/
