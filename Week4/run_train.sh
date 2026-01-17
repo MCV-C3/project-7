@@ -24,7 +24,7 @@ cd /home/mcvstudent29/Week4
 # Dataset: MIT Scenes with 50 images/class (400 total training images)
 # Strategy: Conservative approach to avoid overfitting on small dataset
 # 
-# Key settings rationale:
+# Baseline settings rationale:
 # - batch_size=16: Good balance for 400 images (25 batches/epoch)
 # - epochs=50: Enough to see full learning curve and convergence
 # - learning_rate=1e-3: Standard starting point for AdamW

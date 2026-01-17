@@ -14,7 +14,7 @@ class SimpleCNN(nn.Module):
         - Fully connected classifier
     """
     
-    def __init__(self, num_classes: int = 8, input_channels: int = 3, dropout: float = 0.5):
+    def __init__(self, num_classes: int = 8, input_channels: int = 3, dropout: float = 0.3):
         """
         Initialize the SimpleCNN model.
         
@@ -25,25 +25,40 @@ class SimpleCNN(nn.Module):
         """
         super(SimpleCNN, self).__init__()
         
+        # Store activation for consistency
+        self.relu = nn.ReLU()
+        
         # Convolutional Block 1: 3 -> 32 channels
-        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm2d(32)
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)  # 224 -> 112
+        self.block1 = nn.Sequential(
+            nn.Conv2d(input_channels, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 224 -> 112
+        )
         
         # Convolutional Block 2: 32 -> 64 channels
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.bn2 = nn.BatchNorm2d(64)
-        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)  # 112 -> 56
+        self.block2 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 112 -> 56
+        )
         
         # Convolutional Block 3: 64 -> 128 channels
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.bn3 = nn.BatchNorm2d(128)
-        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)  # 56 -> 28
+        self.block3 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 56 -> 28
+        )
         
         # Convolutional Block 4: 128 -> 256 channels
-        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
-        self.bn4 = nn.BatchNorm2d(256)
-        self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)  # 28 -> 14
+        self.block4 = nn.Sequential(
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 28 -> 14
+        )
         
         # Adaptive pooling to get fixed size output
         self.adaptive_pool = nn.AdaptiveAvgPool2d((7, 7))
@@ -57,7 +72,7 @@ class SimpleCNN(nn.Module):
         self._initialize_weights()
     
     def _initialize_weights(self):
-        """Initialize weights using He initialization for ReLU activations."""
+        """Initialize weights using Kaiming initialization for ReLU activations."""
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -67,7 +82,7 @@ class SimpleCNN(nn.Module):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.Linear):
-                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                 nn.init.constant_(m.bias, 0)
     
     def forward(self, x):
@@ -80,29 +95,11 @@ class SimpleCNN(nn.Module):
         Returns:
             torch.Tensor: Output logits of shape (batch_size, num_classes)
         """
-        # Block 1
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = F.relu(x)
-        x = self.pool1(x)
-        
-        # Block 2
-        x = self.conv2(x)
-        x = self.bn2(x)
-        x = F.relu(x)
-        x = self.pool2(x)
-        
-        # Block 3
-        x = self.conv3(x)
-        x = self.bn3(x)
-        x = F.relu(x)
-        x = self.pool3(x)
-        
-        # Block 4
-        x = self.conv4(x)
-        x = self.bn4(x)
-        x = F.relu(x)
-        x = self.pool4(x)
+        # Convolutional blocks
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        x = self.block4(x)
         
         # Adaptive pooling
         x = self.adaptive_pool(x)
@@ -112,7 +109,7 @@ class SimpleCNN(nn.Module):
         
         # Fully connected layers
         x = self.fc1(x)
-        x = F.relu(x)
+        x = self.relu(x)
         x = self.dropout(x)
         x = self.fc2(x)
         
