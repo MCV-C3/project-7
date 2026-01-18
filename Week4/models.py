@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms.v2 as transforms
+from typing import List
 
 
 class SimpleCNN(nn.Module):
@@ -100,6 +101,122 @@ class SimpleCNN(nn.Module):
         x = self.block2(x)
         x = self.block3(x)
         x = self.block4(x)
+        
+        # Adaptive pooling
+        x = self.adaptive_pool(x)
+        
+        # Flatten
+        x = x.view(x.size(0), -1)
+        
+        # Fully connected layers
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        
+        return x
+
+
+class FlexibleCNN(nn.Module):
+    """
+    Flexible CNN for architecture search experiments.
+    Configurable depth (number of blocks) and width (channel progression).
+    Maintains same design patterns as SimpleCNN for fair comparison.
+    """
+    
+    def __init__(
+        self, 
+        num_classes: int = 8,
+        input_channels: int = 3,
+        channels: List[int] = [32, 64, 128, 256],
+        kernel_size: int = 3,
+        pooling_type: str = 'max',
+        fc_hidden: int = 512,
+        dropout: float = 0.3
+    ):
+        """
+        Initialize FlexibleCNN with configurable architecture.
+        
+        Args:
+            num_classes (int): Number of output classes
+            input_channels (int): Number of input channels (3 for RGB)
+            channels (List[int]): Channel progression for each conv block
+            kernel_size (int): Kernel size for all conv layers (default: 3)
+            pooling_type (str): 'max' for MaxPool2d, 'strided_conv' for strided convolution
+            fc_hidden (int): Hidden units in FC layer (default: 512)
+            dropout (float): Dropout probability
+        """
+        super(FlexibleCNN, self).__init__()
+        
+        self.num_blocks = len(channels)
+        self.channels = channels
+        self.relu = nn.ReLU()
+        
+        # Build convolutional blocks dynamically
+        self.blocks = nn.ModuleList()
+        in_channels = input_channels
+        
+        for out_channels in channels:
+            block = self._make_conv_block(
+                in_channels, 
+                out_channels, 
+                kernel_size, 
+                pooling_type
+            )
+            self.blocks.append(block)
+            in_channels = out_channels
+        
+        # Adaptive pooling to get fixed size output
+        self.adaptive_pool = nn.AdaptiveAvgPool2d((7, 7))
+        
+        # Fully connected layers
+        self.fc1 = nn.Linear(channels[-1] * 7 * 7, fc_hidden)
+        self.dropout = nn.Dropout(dropout)
+        self.fc2 = nn.Linear(fc_hidden, num_classes)
+        
+        # Initialize weights
+        self._initialize_weights()
+    
+    def _make_conv_block(self, in_channels: int, out_channels: int, 
+                         kernel_size: int, pooling_type: str) -> nn.Sequential:
+        """Create a convolutional block with Conv -> BN -> ReLU -> Pool."""
+        padding = kernel_size // 2  # Maintain spatial dimensions
+        
+        layers = [
+            nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, padding=padding),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        ]
+        
+        # Add pooling layer
+        if pooling_type == 'max':
+            layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+        elif pooling_type == 'strided_conv':
+            layers.append(nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=2, padding=1))
+            layers.append(nn.BatchNorm2d(out_channels))
+            layers.append(nn.ReLU())
+        
+        return nn.Sequential(*layers)
+    
+    def _initialize_weights(self):
+        """Initialize weights using Kaiming initialization for ReLU activations."""
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+    
+    def forward(self, x):
+        """Forward pass through the network."""
+        # Pass through all convolutional blocks
+        for block in self.blocks:
+            x = block(x)
         
         # Adaptive pooling
         x = self.adaptive_pool(x)

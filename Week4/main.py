@@ -10,7 +10,7 @@ import tqdm
 import wandb
 from datetime import datetime
 
-from models import SimpleCNN, build_transforms
+from models import SimpleCNN, FlexibleCNN, build_transforms
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 
 
@@ -135,6 +135,7 @@ def main(args):
     # Initialize wandb with custom ID that includes experiment name and timestamp
     timestamp_short = datetime.now().strftime("%H%M%S")
     wandb_run_id = f"{args.experiment_name}_{timestamp_short}_{wandb.util.generate_id()}"
+    
     wandb.init(
         id=wandb_run_id,
         project=args.wandb_project,
@@ -207,11 +208,29 @@ def main(args):
     # Create model
     num_classes = len(train_dataset.classes)
     print("Creating model...")
-    model = SimpleCNN(
-        num_classes=num_classes,
-        input_channels=input_channels,
-        dropout=args.dropout
-    )
+    
+    # Choose model type based on argument
+    if args.model_type == 'simple':
+        model = SimpleCNN(
+            num_classes=num_classes,
+            input_channels=input_channels,
+            dropout=args.dropout
+        )
+    elif args.model_type == 'flexible':
+        # Parse channels list from comma-separated string
+        channels = [int(c) for c in args.channels.split(',')]
+        model = FlexibleCNN(
+            num_classes=num_classes,
+            input_channels=input_channels,
+            channels=channels,
+            kernel_size=args.kernel_size,
+            pooling_type=args.pooling_type,
+            fc_hidden=args.fc_hidden,
+            dropout=args.dropout
+        )
+    else:
+        raise ValueError(f"Unknown model type: {args.model_type}")
+    
     model = model.to(device)
     print(f"✓ Model created and moved to {device}\n")
     
@@ -470,6 +489,40 @@ if __name__ == "__main__":
         type=int,
         default=8,
         help="Number of data loading workers"
+    )
+    
+    # Model architecture parameters (for FlexibleCNN)
+    parser.add_argument(
+        "--model_type",
+        type=str,
+        choices=["simple", "flexible"],
+        default="simple",
+        help="Model architecture type"
+    )
+    parser.add_argument(
+        "--channels",
+        type=str,
+        default="32,64,128,256",
+        help="Comma-separated list of channel sizes for FlexibleCNN"
+    )
+    parser.add_argument(
+        "--kernel_size",
+        type=int,
+        default=3,
+        help="Kernel size for convolutions in FlexibleCNN"
+    )
+    parser.add_argument(
+        "--pooling_type",
+        type=str,
+        choices=["max", "strided_conv"],
+        default="max",
+        help="Pooling type for FlexibleCNN"
+    )
+    parser.add_argument(
+        "--fc_hidden",
+        type=int,
+        default=512,
+        help="Hidden units in FC layer for FlexibleCNN"
     )
     
     args = parser.parse_args()
