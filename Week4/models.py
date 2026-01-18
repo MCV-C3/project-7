@@ -119,6 +119,196 @@ class OptimizedCNN(nn.Module):
         return x
 
 
+class SEBlock(nn.Module):
+    """
+    Squeeze-and-Excitation block for channel attention.
+    
+    Recalibrates channel-wise feature responses by:
+    1. Squeeze: Global pooling to aggregate spatial information
+    2. Excitation: Two FC layers to capture channel dependencies
+    3. Scale: Multiply input features by learned channel weights
+    
+    Paper: "Squeeze-and-Excitation Networks" (Hu et al., 2018)
+    """
+    
+    def __init__(self, channels: int, reduction: int = 4):
+        """
+        Initialize SE block.
+        
+        Args:
+            channels (int): Number of input channels
+            reduction (int): Reduction ratio for bottleneck (default: 4)
+                           Higher = fewer params, lower = more expressiveness
+        """
+        super(SEBlock, self).__init__()
+        
+        # Squeeze: Global average pooling
+        self.squeeze = nn.AdaptiveAvgPool2d(1)
+        
+        # Excitation: FC layers for channel-wise gating
+        self.excitation = nn.Sequential(
+            nn.Linear(channels, channels // reduction, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(channels // reduction, channels, bias=False),
+            nn.Sigmoid()  # Output in [0,1] for gating
+        )
+    
+    def forward(self, x):
+        """
+        Forward pass through SE block.
+        
+        Args:
+            x (torch.Tensor): Input features of shape (B, C, H, W)
+            
+        Returns:
+            torch.Tensor: Recalibrated features of shape (B, C, H, W)
+        """
+        b, c, _, _ = x.size()
+        
+        # Squeeze: global spatial pooling (B, C, H, W) -> (B, C, 1, 1)
+        y = self.squeeze(x).view(b, c)
+        
+        # Excitation: channel-wise gating (B, C) -> (B, C)
+        y = self.excitation(y).view(b, c, 1, 1)
+        
+        # Scale: recalibrate input features
+        return x * y.expand_as(x)
+
+
+class SEOptimizedCNN(nn.Module):
+    """
+    Optimized CNN with Squeeze-and-Excitation attention blocks.
+    
+    Extends OptimizedCNN by adding SE blocks after each convolutional block
+    for channel-wise feature recalibration.
+    
+    Architecture:
+    - Base: [16,32,64,128] channels + GAP + direct classification
+    - Addition: SE blocks with reduction=4 after each conv block
+        
+    Advantages over baseline:
+    - Channel attention learns which features are important
+    - Minimal parameter overhead (~11K params)
+    - Synergy with GAP (both use global pooling)
+    - Regularization effect through gating
+    """
+    
+    def __init__(self, num_classes: int = 8, input_channels: int = 3, 
+                 dropout: float = 0.3, se_reduction: int = 4):
+        """
+        Initialize SEOptimizedCNN with attention.
+        
+        Args:
+            num_classes (int): Number of output classes (default: 8 for MIT scenes)
+            input_channels (int): Number of input channels (3 for RGB images)
+            dropout (float): Dropout probability for regularization (default: 0.3)
+            se_reduction (int): SE reduction ratio (default: 4)
+                              - Higher = fewer params, lower = more expressiveness
+                              - 4 is standard for small networks
+        """
+        super(SEOptimizedCNN, self).__init__()
+        
+        # Store activation
+        self.relu = nn.ReLU()
+        
+        # Convolutional Block 1: 3 -> 16 channels
+        self.block1 = nn.Sequential(
+            nn.Conv2d(input_channels, 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 224 -> 112
+        )
+        self.se1 = SEBlock(16, reduction=se_reduction)
+        
+        # Convolutional Block 2: 16 -> 32 channels
+        self.block2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 112 -> 56
+        )
+        self.se2 = SEBlock(32, reduction=se_reduction)
+        
+        # Convolutional Block 3: 32 -> 64 channels
+        self.block3 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 56 -> 28
+        )
+        self.se3 = SEBlock(64, reduction=se_reduction)
+        
+        # Convolutional Block 4: 64 -> 128 channels
+        self.block4 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 28 -> 14
+        )
+        self.se4 = SEBlock(128, reduction=se_reduction)
+        
+        # Global Average Pooling (1×1)
+        # Reduces 128×14×14 = 25,088 features → 128×1×1 = 128 features
+        self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
+        
+        # Direct classification: 128 → 8 (no hidden layer)
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(128, num_classes)
+        
+        # Initialize weights
+        self._initialize_weights()
+    
+    def _initialize_weights(self):
+        """Initialize weights using Kaiming initialization for ReLU activations."""
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+    
+    def forward(self, x):
+        """
+        Forward pass through the network with SE attention.
+        
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, 3, 224, 224)
+            
+        Returns:
+            torch.Tensor: Output logits of shape (batch_size, num_classes)
+        """
+        # Convolutional blocks with SE attention
+        x = self.block1(x)
+        x = self.se1(x)  # Channel attention after block1
+        
+        x = self.block2(x)
+        x = self.se2(x)  # Channel attention after block2
+        
+        x = self.block3(x)
+        x = self.se3(x)  # Channel attention after block3
+        
+        x = self.block4(x)
+        x = self.se4(x)  # Channel attention after block4
+        
+        # Global Average Pooling
+        x = self.adaptive_pool(x)  # (batch, 128, 1, 1)
+        
+        # Flatten
+        x = x.view(x.size(0), -1)  # (batch, 128)
+        
+        # Direct classification
+        x = self.dropout(x)
+        x = self.fc(x)
+        
+        return x
+
+
 class SimpleCNN(nn.Module):
     """
     Simple CNN built from scratch for image classification.

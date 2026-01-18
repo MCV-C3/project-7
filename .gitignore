@@ -6,6 +6,8 @@ Week*/wandb/
 # !Week4/output/
 # !Week4/wandb/
 
+SE_ATTENTION_MECHANISM.md
+
 # Ignore output and wandb at root level if any
 /output/
 /wandb/

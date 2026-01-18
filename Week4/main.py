@@ -10,7 +10,7 @@ import tqdm
 import wandb
 from datetime import datetime
 
-from models import SimpleCNN, FlexibleCNN, OptimizedCNN, build_transforms
+from models import SimpleCNN, FlexibleCNN, OptimizedCNN, SEOptimizedCNN, build_transforms
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 
 
@@ -215,6 +215,13 @@ def main(args):
             num_classes=num_classes,
             input_channels=input_channels,
             dropout=args.dropout
+        )
+    elif args.model_type == 'se_optimized':
+        model = SEOptimizedCNN(
+            num_classes=num_classes,
+            input_channels=input_channels,
+            dropout=args.dropout,
+            se_reduction=args.se_reduction
         )
     elif args.model_type == 'simple':
         model = SimpleCNN(
@@ -511,9 +518,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_type",
         type=str,
-        choices=["optimized", "simple", "flexible"],
+        choices=["optimized", "se_optimized", "simple", "flexible"],
         default="optimized",
-        help="Model architecture type: 'optimized' (default, post-experiment baseline), 'simple' (original SimpleCNN), 'flexible' (configurable architecture)"
+        help="Model architecture type: 'optimized' (default, post-experiment baseline), 'se_optimized' (with SE attention), 'simple' (original SimpleCNN), 'flexible' (configurable architecture)"
+    )
+    parser.add_argument(
+        "--se_reduction",
+        type=int,
+        default=4,
+        help="Reduction ratio for SE blocks in SEOptimizedCNN (default: 4)"
     )
     parser.add_argument(
         "--channels",
