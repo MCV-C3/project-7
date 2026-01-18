@@ -10,7 +10,7 @@ import tqdm
 import wandb
 from datetime import datetime
 
-from models import SimpleCNN, FlexibleCNN, build_transforms
+from models import SimpleCNN, FlexibleCNN, OptimizedCNN, build_transforms
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 
 
@@ -210,7 +210,13 @@ def main(args):
     print("Creating model...")
     
     # Choose model type based on argument
-    if args.model_type == 'simple':
+    if args.model_type == 'optimized':
+        model = OptimizedCNN(
+            num_classes=num_classes,
+            input_channels=input_channels,
+            dropout=args.dropout
+        )
+    elif args.model_type == 'simple':
         model = SimpleCNN(
             num_classes=num_classes,
             input_channels=input_channels,
@@ -505,9 +511,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_type",
         type=str,
-        choices=["simple", "flexible"],
-        default="simple",
-        help="Model architecture type"
+        choices=["optimized", "simple", "flexible"],
+        default="optimized",
+        help="Model architecture type: 'optimized' (default, post-experiment baseline), 'simple' (original SimpleCNN), 'flexible' (configurable architecture)"
     )
     parser.add_argument(
         "--channels",

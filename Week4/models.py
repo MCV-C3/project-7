@@ -5,6 +5,120 @@ import torchvision.transforms.v2 as transforms
 from typing import List
 
 
+class OptimizedCNN(nn.Module):
+    """
+    Optimized CNN architecture after architecture search + adaptive pooling experiments.
+    
+    Key design decisions validated through systematic experiments:
+    - Narrow channels [16,32,64,128]: Reduces conv overfitting (from arch search)
+    - Global Average Pooling (1×1): Eliminates spatial redundancy, reduces FC params
+    - Direct classification: No hidden FC layer (128 → 8), minimal overfitting
+    
+    Performance: 75.87% test acc, 2.88% train-test gap, 98,952 total params
+    Baseline comparison: Original SimpleCNN had 28.58% gap with 6.8M params
+    """
+    
+    def __init__(self, num_classes: int = 8, input_channels: int = 3, dropout: float = 0.3):
+        """
+        Initialize OptimizedCNN with validated architecture.
+        
+        Args:
+            num_classes (int): Number of output classes (default: 8 for MIT scenes)
+            input_channels (int): Number of input channels (3 for RGB images)
+            dropout (float): Dropout probability for regularization (default: 0.3)
+        """
+        super(OptimizedCNN, self).__init__()
+        
+        # Store activation
+        self.relu = nn.ReLU()
+        
+        # Convolutional Block 1: 3 -> 16 channels
+        self.block1 = nn.Sequential(
+            nn.Conv2d(input_channels, 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 224 -> 112
+        )
+        
+        # Convolutional Block 2: 16 -> 32 channels
+        self.block2 = nn.Sequential(
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 112 -> 56
+        )
+        
+        # Convolutional Block 3: 32 -> 64 channels
+        self.block3 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 56 -> 28
+        )
+        
+        # Convolutional Block 4: 64 -> 128 channels
+        self.block4 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)  # 28 -> 14
+        )
+        
+        # Global Average Pooling (1×1)
+        # Reduces 128×14×14 = 25,088 features → 128×1×1 = 128 features
+        self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
+        
+        # Direct classification: 128 → 8 (no hidden layer)
+        # Parameters: 128×8 + 8 bias = 1,032 params (vs 3.2M in original baseline)
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(128, num_classes)
+        
+        # Initialize weights
+        self._initialize_weights()
+    
+    def _initialize_weights(self):
+        """Initialize weights using Kaiming initialization for ReLU activations."""
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
+    
+    def forward(self, x):
+        """
+        Forward pass through the network.
+        
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, 3, 224, 224)
+            
+        Returns:
+            torch.Tensor: Output logits of shape (batch_size, num_classes)
+        """
+        # Convolutional blocks
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        x = self.block4(x)
+        
+        # Global Average Pooling
+        x = self.adaptive_pool(x)  # (batch, 128, 1, 1)
+        
+        # Flatten
+        x = x.view(x.size(0), -1)  # (batch, 128)
+        
+        # Direct classification
+        x = self.dropout(x)
+        x = self.fc(x)
+        
+        return x
+
+
 class SimpleCNN(nn.Module):
     """
     Simple CNN built from scratch for image classification.

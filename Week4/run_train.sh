@@ -49,7 +49,7 @@ cd /home/mcvstudent29/Week4
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output \
-    --experiment_name gap_avg_direct_baseline \
+    --experiment_name optimized_baseline \
     --wandb_project C3_Week4 \
     --batch_size 16 \
     --epochs 20 \
@@ -57,10 +57,8 @@ python main.py \
     --weight_decay 1e-4 \
     --optimizer AdamW \
     --dropout 0.3 \
-    --kernel_size 3 \
-    --model_type flexible \
-    --channels "16,32,64,128" \
-    --pool_output_size "1,1" \
-    --adaptive_pool_type avg \
     --seed 42 \
     --num_workers 8
+    
+# Note: --model_type defaults to 'optimized' (no need to specify)
+# OptimizedCNN has fixed architecture: [16,32,64,128] + GAP + direct classification
