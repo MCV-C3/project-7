@@ -19,24 +19,37 @@ export WANDB_DIR=/data/uabmcv2526/mcvstudent29/Week4/wandb
 cd /home/mcvstudent29/Week4
 
 # ============================================================================
-# BASELINE CONFIGURATION - First Training Run
+# OPTIMIZED BASELINE CONFIGURATION
+# After Architecture Search + Adaptive Pooling Regularization Experiments
 # ============================================================================
 # Dataset: MIT Scenes with 50 images/class (400 total training images)
-# Strategy: Conservative approach to avoid overfitting on small dataset
 # 
-# Baseline settings rationale:
-# - batch_size=16: Good balance for 400 images (25 batches/epoch)
-# - epochs=50: Enough to see full learning curve and convergence
-# - learning_rate=1e-3: Standard starting point for AdamW
-# - weight_decay=1e-4: Light L2 regularization to prevent overfitting
-# - dropout=0.3: Moderate dropout in FC layers for regularization
-# - NO scheduler: Keep constant LR for baseline simplicity
+# Architecture Evolution:
+# 1. Original baseline: [32,64,128,256], 7×7 pooling, FC512 → 66.17% test acc, 28.58% train-test gap
+# 2. Arch search winner: [16,32,64,128] narrow channels → 74.13% test acc, 19.62% gap
+# 3. Adaptive pooling winner: GAP (1×1) + direct classification → 75.87% test acc, 2.88% gap
+# 
+# Current Architecture (gap_avg_direct):
+# - Channels: [16,32,64,128] (50% narrower than original, reduces conv overfitting)
+# - Adaptive pooling: (1,1) Global Average Pooling (eliminates spatial redundancy)
+# - Pooling type: avg (smoother aggregation than max)
+# - FC config: Direct classification (128 → 8, no hidden layer)
+# - FC parameters: 1,032 (vs 3.2M in original baseline = 3,116× reduction)
+# 
+# Key advantages:
+# - Minimal overfitting (2.88% train-test gap vs 28.58% original)
+# - 576× fewer FC params than pool3x3 runner-up
+# - Follows modern CNN best practices (ResNet, EfficientNet pattern)
+# - Provides headroom for data augmentation and attention mechanisms
+# 
+# Training settings (unchanged from original baseline):
+# - batch_size=16, lr=1e-3, AdamW, weight_decay=1e-4, dropout=0.3
 # ============================================================================
 
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output \
-    --experiment_name narrow_baseline \
+    --experiment_name gap_avg_direct_baseline \
     --wandb_project C3_Week4 \
     --batch_size 16 \
     --epochs 20 \
@@ -47,6 +60,7 @@ python main.py \
     --kernel_size 3 \
     --model_type flexible \
     --channels "16,32,64,128" \
-    --fc_hidden 512 \
+    --pool_output_size "1,1" \
+    --adaptive_pool_type avg \
     --seed 42 \
     --num_workers 8

@@ -39,7 +39,7 @@ def plot_metrics(train_metrics: Dict, test_metrics: Dict, metric_name: str, outp
     plt.close()  # Close the figure to free memory
 
 
-def save_training_summary(output_dir: str, config: Dict, best_val_acc: float, best_epoch: int):
+def save_training_summary(output_dir: str, config: Dict, best_val_acc: float, best_epoch: int, train_acc_at_best: float = None):
     """
     Save a summary of the training run to a text file.
     
@@ -48,6 +48,7 @@ def save_training_summary(output_dir: str, config: Dict, best_val_acc: float, be
         config (Dict): Configuration dictionary
         best_val_acc (float): Best validation accuracy achieved
         best_epoch (int): Epoch at which best validation accuracy was achieved
+        train_acc_at_best (float): Training accuracy at best epoch
     """
     summary_path = os.path.join(output_dir, "training_summary.txt")
     
@@ -64,8 +65,10 @@ def save_training_summary(output_dir: str, config: Dict, best_val_acc: float, be
         f.write("\n" + "=" * 50 + "\n")
         f.write("Results:\n")
         f.write("-" * 50 + "\n")
-        f.write(f"  Best Validation Accuracy: {best_val_acc:.4f}\n")
+        f.write(f"  Best Validation Accuracy: {best_val_acc*100:.2f}%\n")
+        f.write(f"  Best Test Accuracy: {best_val_acc*100:.2f}%\n")  # Same as validation for now
         f.write(f"  Best Epoch: {best_epoch}\n")
+        f.write(f"  Training Accuracy at Best Epoch: {train_acc_at_best*100:.2f}%\n")
         f.write("=" * 50 + "\n")
     
     print(f"Training summary saved to {summary_path}")

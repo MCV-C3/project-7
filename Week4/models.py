@@ -132,7 +132,10 @@ class FlexibleCNN(nn.Module):
         kernel_size: int = 3,
         pooling_type: str = 'max',
         fc_hidden: int = 512,
-        dropout: float = 0.3
+        dropout: float = 0.3,
+        pool_output_size: tuple = (7, 7),
+        use_fc_hidden: bool = True,
+        adaptive_pool_type: str = 'avg'
     ):
         """
         Initialize FlexibleCNN with configurable architecture.
@@ -142,15 +145,20 @@ class FlexibleCNN(nn.Module):
             input_channels (int): Number of input channels (3 for RGB)
             channels (List[int]): Channel progression for each conv block
             kernel_size (int): Kernel size for all conv layers (default: 3)
-            pooling_type (str): 'max' for MaxPool2d, 'strided_conv' for strided convolution
+            pooling_type (str): 'max' for MaxPool2d, 'strided_conv' for strided convolution (inside conv blocks)
             fc_hidden (int): Hidden units in FC layer (default: 512)
             dropout (float): Dropout probability
+            pool_output_size (tuple): Output size for adaptive pooling (default: (7, 7), use (1, 1) for GAP)
+            use_fc_hidden (bool): If True, use hidden FC layer; if False, direct classification
+            adaptive_pool_type (str): 'avg' for AdaptiveAvgPool2d, 'max' for AdaptiveMaxPool2d (default: 'avg')
         """
         super(FlexibleCNN, self).__init__()
         
         self.num_blocks = len(channels)
         self.channels = channels
         self.relu = nn.ReLU()
+        self.use_fc_hidden = use_fc_hidden
+        self.pool_output_size = pool_output_size
         
         # Build convolutional blocks dynamically
         self.blocks = nn.ModuleList()
@@ -167,12 +175,24 @@ class FlexibleCNN(nn.Module):
             in_channels = out_channels
         
         # Adaptive pooling to get fixed size output
-        self.adaptive_pool = nn.AdaptiveAvgPool2d((7, 7))
+        if adaptive_pool_type == 'max':
+            self.adaptive_pool = nn.AdaptiveMaxPool2d(pool_output_size)
+        else:  # default to avg
+            self.adaptive_pool = nn.AdaptiveAvgPool2d(pool_output_size)
+        
+        # Calculate flattened feature size
+        flattened_size = channels[-1] * pool_output_size[0] * pool_output_size[1]
         
         # Fully connected layers
-        self.fc1 = nn.Linear(channels[-1] * 7 * 7, fc_hidden)
-        self.dropout = nn.Dropout(dropout)
-        self.fc2 = nn.Linear(fc_hidden, num_classes)
+        if use_fc_hidden:
+            self.fc1 = nn.Linear(flattened_size, fc_hidden)
+            self.dropout = nn.Dropout(dropout)
+            self.fc2 = nn.Linear(fc_hidden, num_classes)
+        else:
+            # Direct classification (no hidden layer)
+            self.fc1 = None
+            self.dropout = nn.Dropout(dropout)
+            self.fc2 = nn.Linear(flattened_size, num_classes)
         
         # Initialize weights
         self._initialize_weights()
@@ -225,10 +245,15 @@ class FlexibleCNN(nn.Module):
         x = x.view(x.size(0), -1)
         
         # Fully connected layers
-        x = self.fc1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-        x = self.fc2(x)
+        if self.use_fc_hidden:
+            x = self.fc1(x)
+            x = self.relu(x)
+            x = self.dropout(x)
+            x = self.fc2(x)
+        else:
+            # Direct classification
+            x = self.dropout(x)
+            x = self.fc2(x)
         
         return x
 

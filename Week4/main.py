@@ -219,6 +219,10 @@ def main(args):
     elif args.model_type == 'flexible':
         # Parse channels list from comma-separated string
         channels = [int(c) for c in args.channels.split(',')]
+        
+        # Parse pool_output_size from string (e.g., "7,7" or "1,1")
+        pool_output_size = tuple([int(x) for x in args.pool_output_size.split(',')])
+        
         model = FlexibleCNN(
             num_classes=num_classes,
             input_channels=input_channels,
@@ -226,7 +230,10 @@ def main(args):
             kernel_size=args.kernel_size,
             pooling_type=args.pooling_type,
             fc_hidden=args.fc_hidden,
-            dropout=args.dropout
+            dropout=args.dropout,
+            pool_output_size=pool_output_size,
+            use_fc_hidden=args.use_fc_hidden,
+            adaptive_pool_type=args.adaptive_pool_type
         )
     else:
         raise ValueError(f"Unknown model type: {args.model_type}")
@@ -290,6 +297,7 @@ def main(args):
     test_losses, test_accuracies = [], []
     best_val_acc = 0.0
     best_epoch = 0
+    train_acc_at_best = 0.0
     model_path = os.path.join(output_dir, "best_model.pt")
     
     print("\n" + "=" * 70)
@@ -333,6 +341,7 @@ def main(args):
         if test_acc > best_val_acc:
             best_val_acc = test_acc
             best_epoch = epoch + 1
+            train_acc_at_best = train_acc
             torch.save(model.state_dict(), model_path)
             print(f"  → New best model saved! Val Acc: {best_val_acc:.4f}")
     
@@ -377,7 +386,8 @@ def main(args):
         output_dir=output_dir,
         config=vars(args),
         best_val_acc=best_val_acc,
-        best_epoch=best_epoch
+        best_epoch=best_epoch,
+        train_acc_at_best=train_acc_at_best
     )
     
     # Close wandb
@@ -523,6 +533,31 @@ if __name__ == "__main__":
         type=int,
         default=512,
         help="Hidden units in FC layer for FlexibleCNN"
+    )
+    parser.add_argument(
+        "--pool_output_size",
+        type=str,
+        default="7,7",
+        help="Output size for adaptive pooling (e.g., '7,7' or '1,1' for GAP)"
+    )
+    parser.add_argument(
+        "--use_fc_hidden",
+        action="store_true",
+        default=True,
+        help="Use hidden FC layer (if False, direct classification)"
+    )
+    parser.add_argument(
+        "--no_fc_hidden",
+        action="store_false",
+        dest="use_fc_hidden",
+        help="Disable hidden FC layer for direct classification"
+    )
+    parser.add_argument(
+        "--adaptive_pool_type",
+        type=str,
+        choices=["avg", "max"],
+        default="avg",
+        help="Type of adaptive pooling: 'avg' or 'max'"
     )
     
     args = parser.parse_args()
