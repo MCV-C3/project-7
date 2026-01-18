@@ -36,7 +36,7 @@ cd /home/mcvstudent29/Week4
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output \
-    --experiment_name baseline \
+    --experiment_name narrow_baseline \
     --wandb_project C3_Week4 \
     --batch_size 16 \
     --epochs 20 \
@@ -44,5 +44,9 @@ python main.py \
     --weight_decay 1e-4 \
     --optimizer AdamW \
     --dropout 0.3 \
+    --kernel_size 3 \
+    --model_type flexible \
+    --channels "16,32,64,128" \
+    --fc_hidden 512 \
     --seed 42 \
     --num_workers 8
