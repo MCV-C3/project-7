@@ -32,9 +32,9 @@ WIDTH_CONFIGS = {
 }
 
 DEPTH_CONFIGS = {
-    'shallow': 2,  # 2 blocks
-    'baseline': 3,  # 3 blocks  
-    'deep': 4      # 4 blocks
+    'shallow': 2,   # 2 blocks
+    'moderate': 3,  # 3 blocks  
+    'baseline': 4   # 4 blocks (original SimpleCNN)
 }
 
 # Pooling configurations
@@ -74,8 +74,11 @@ def generate_experiments() -> List[Dict]:
     for depth_name, num_blocks in DEPTH_CONFIGS.items():
         for width_name, channels_list in WIDTH_CONFIGS.items():
             for pool_config in POOLING_CONFIGS:
+                # Truncate channels to match num_blocks
+                channels_truncated = channels_list[:num_blocks]
+                
                 # Calculate FC params
-                last_channel = channels_list[-1]
+                last_channel = channels_truncated[-1]
                 fc_params = calculate_fc_params(
                     pool_config['size'],
                     last_channel,
@@ -90,14 +93,14 @@ def generate_experiments() -> List[Dict]:
                     'depth_name': depth_name,
                     'num_blocks': num_blocks,
                     'width_name': width_name,
-                    'channels': channels_list,
-                    'channels_str': ','.join(map(str, channels_list)),
+                    'channels': channels_truncated,
+                    'channels_str': ','.join(map(str, channels_truncated)),
                     'pool_size': pool_config['size'],
                     'pool_type': pool_config['type'],
                     'use_fc_hidden': pool_config['use_fc_hidden'],
                     'fc_hidden': pool_config['fc_hidden'] if pool_config['use_fc_hidden'] else None,
                     'fc_params': fc_params,
-                    'description': f"{num_blocks} blocks, {width_name} {channels_list}, "
+                    'description': f"{num_blocks} blocks, {width_name} {channels_truncated}, "
                                  f"pool {pool_config['size']} ({pool_config['type']}), "
                                  f"{'FC512' if pool_config['use_fc_hidden'] else 'direct'}"
                 }
@@ -124,8 +127,18 @@ def parse_training_summary(summary_file: Path) -> Dict:
         for line in lines:
             line = line.strip()
             
+            # Parse train accuracy at best epoch FIRST (format: "Training Accuracy at Best Epoch: 91.00%")
+            # Must come before "Best Epoch:" check since it contains that substring
+            if 'Training Accuracy at Best Epoch:' in line:
+                try:
+                    train_str = line.split(':')[1].strip()
+                    train_str = train_str.replace('%', '')
+                    results['train_accuracy_at_best_epoch'] = float(train_str) / 100.0
+                except (ValueError, IndexError) as e:
+                    print(f"  Warning: Could not parse train accuracy from: {line}")
+            
             # Parse best validation accuracy (format: "Best Validation Accuracy: 72.60%")
-            if 'Best Validation Accuracy:' in line:
+            elif 'Best Validation Accuracy:' in line:
                 try:
                     # Extract percentage value
                     val_str = line.split(':')[1].strip()
@@ -144,21 +157,13 @@ def parse_training_summary(summary_file: Path) -> Dict:
                     print(f"  Warning: Could not parse test accuracy from: {line}")
             
             # Parse best epoch (format: "Best Epoch: 18")
+            # Must come AFTER "Training Accuracy at Best Epoch:" check
             elif 'Best Epoch:' in line:
                 try:
                     epoch_str = line.split(':')[1].strip()
                     results['best_epoch'] = int(epoch_str)
                 except (ValueError, IndexError) as e:
                     print(f"  Warning: Could not parse best epoch from: {line}")
-            
-            # Parse train accuracy at best epoch (format: "Training Accuracy at Best Epoch: 91.00%")
-            elif 'Training Accuracy at Best Epoch:' in line:
-                try:
-                    train_str = line.split(':')[1].strip()
-                    train_str = train_str.replace('%', '')
-                    results['train_accuracy_at_best_epoch'] = float(train_str) / 100.0
-                except (ValueError, IndexError) as e:
-                    print(f"  Warning: Could not parse train accuracy from: {line}")
         
         # Validate we got the key metrics
         if results['val_accuracy'] is None or results['test_accuracy'] is None:
@@ -255,13 +260,19 @@ def run_single_experiment(exp: Dict, args: argparse.Namespace, week4_dir: Path) 
             exp['results'].update(parsed_results)
             exp['results']['output_dir'] = str(Path(latest_summary).parent)
             
-            if exp['results']['val_accuracy'] is not None:
+            # Check if parsing was successful
+            if (exp['results']['val_accuracy'] is not None and 
+                exp['results']['test_accuracy'] is not None and
+                exp['results']['train_accuracy_at_best_epoch'] is not None and
+                exp['results']['best_epoch'] is not None):
                 print(f"  ✓ Parsed results successfully:")
                 print(f"    Val Acc: {exp['results']['val_accuracy']:.4f} | "
                       f"Test Acc: {exp['results']['test_accuracy']:.4f} | "
                       f"Train Acc @ epoch {exp['results']['best_epoch']}: {exp['results']['train_accuracy_at_best_epoch']:.4f}")
             else:
-                print(f"  ⚠ Warning: Failed to parse results from summary file!")
+                print(f"  ⚠ Warning: Incomplete parsing from summary file!")
+                print(f"    Val: {exp['results']['val_accuracy']}, Test: {exp['results']['test_accuracy']}, "
+                      f"Train: {exp['results']['train_accuracy_at_best_epoch']}, Epoch: {exp['results']['best_epoch']}")
                 print(f"    Check {latest_summary} for formatting issues")
         else:
             print(f"  ⚠ Warning: Could not find summary file matching pattern:")
@@ -301,7 +312,7 @@ def save_results_summary(experiments: List[Dict], output_dir: Path):
         f.write("ARCHITECTURE SEARCH V2: COMPREHENSIVE GRID SEARCH\n")
         f.write("="*80 + "\n\n")
         f.write("Experiment Design:\n")
-        f.write("  - Depth: 2, 3, 4 blocks (shallow/baseline/deep)\n")
+        f.write("  - Depth: 2, 3, 4 blocks (shallow/moderate/baseline)\n")
         f.write("  - Width: extra_narrow [8,16,32,64], narrow [16,32,64,128], baseline [32,64,128,256]\n")
         f.write("  - Pooling: (5,5), (3,3), (1,1) with BOTH max and avg\n")
         f.write("  - FC configs: hidden (512) for all, direct for (1,1) only\n")
@@ -358,7 +369,7 @@ def save_results_summary(experiments: List[Dict], output_dir: Path):
         
         # Analyze by depth
         f.write("Average test accuracy by depth:\n")
-        for depth in ['shallow', 'baseline', 'deep']:
+        for depth in ['shallow', 'moderate', 'baseline']:
             depth_exps = [e for e in sorted_exps if e['depth_name'] == depth]
             if depth_exps:
                 avg_acc = sum(e['results']['test_accuracy'] for e in depth_exps) / len(depth_exps)

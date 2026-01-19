@@ -24,8 +24,8 @@
 #   
 #   Depth (3 options):
 #     - shallow: 2 blocks
-#     - baseline: 3 blocks
-#     - deep: 4 blocks
+#     - moderate: 3 blocks
+#     - baseline: 4 blocks (original SimpleCNN)
 #
 #   Width (3 options):
 #     - extra_narrow: [8, 16, 32, 64]
@@ -79,7 +79,7 @@ mkdir -p /data/uabmcv2526/mcvstudent29/Week4/wandb/arch_search_v2
 # Run architecture search V2
 echo "Starting architecture search V2..."
 echo "Testing 72 configurations:"
-echo "  - 3 depths (2, 3, 4 blocks)"
+echo "  - 3 depths (2, 3, 4 blocks: shallow/moderate/baseline)"
 echo "  - 3 widths (extra_narrow, narrow, baseline)"
 echo "  - 8 pooling configs (both max and avg)"
 echo ""
