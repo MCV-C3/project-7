@@ -48,9 +48,6 @@
 #   - Aggressive adaptive pooling (1×1 GAP) reduces overfitting
 #   - Direct classification from GAP provides strong regularization
 #
-# EXPECTED RUNTIME:
-#   ~24-36 hours for 72 trials at 20 epochs each (~20-30 min per trial)
-#   Consider requesting longer SLURM time if needed
 #
 # ============================================================================
 

@@ -118,51 +118,57 @@ def parse_training_summary(summary_file: Path) -> Dict:
     
     try:
         with open(summary_file, 'r') as f:
-            content = f.read()
+            lines = f.readlines()
             
-            # Parse best validation accuracy and epoch
-            if 'Best validation accuracy:' in content:
-                for line in content.split('\n'):
-                    if 'Best validation accuracy:' in line:
-                        # Example: "Best validation accuracy: 0.7255 at epoch 18"
-                        parts = line.split(':')[1].strip().split()
-                        results['val_accuracy'] = float(parts[0])
-                        results['best_epoch'] = int(parts[3])
-                        break
+        # Parse line by line
+        for line in lines:
+            line = line.strip()
             
-            # Parse final test accuracy
-            if 'Final test accuracy:' in content:
-                for line in content.split('\n'):
-                    if 'Final test accuracy:' in line:
-                        # Example: "Final test accuracy: 0.7255"
-                        results['test_accuracy'] = float(line.split(':')[1].strip())
-                        break
+            # Parse best validation accuracy (format: "Best Validation Accuracy: 72.60%")
+            if 'Best Validation Accuracy:' in line:
+                try:
+                    # Extract percentage value
+                    val_str = line.split(':')[1].strip()
+                    val_str = val_str.replace('%', '')
+                    results['val_accuracy'] = float(val_str) / 100.0
+                except (ValueError, IndexError) as e:
+                    print(f"  Warning: Could not parse validation accuracy from: {line}")
             
-            # Parse train accuracy at best epoch
-            # Look for the epoch line corresponding to best_epoch
-            if results['best_epoch'] is not None:
-                epoch_marker = f"Epoch {results['best_epoch']}/20"
-                lines = content.split('\n')
-                for i, line in enumerate(lines):
-                    if epoch_marker in line:
-                        # Next line should have "Train Loss: X | Train Acc: Y"
-                        if i + 1 < len(lines):
-                            train_line = lines[i + 1]
-                            if 'Train Acc:' in train_line:
-                                # Example: "  Train Loss: 0.4857 | Train Acc: 0.8550"
-                                # OR: "  Train Loss: 0.4857 | Train Acc: 85.50%"
-                                acc_part = train_line.split('Train Acc:')[1].strip()
-                                # Remove any trailing characters like newlines
-                                acc_part = acc_part.split()[0]
-                                # Handle percentage format
-                                if '%' in acc_part:
-                                    results['train_accuracy_at_best_epoch'] = float(acc_part.replace('%', '')) / 100.0
-                                else:
-                                    results['train_accuracy_at_best_epoch'] = float(acc_part)
-                                break
+            # Parse test accuracy (format: "Best Test Accuracy: 72.60%")
+            elif 'Best Test Accuracy:' in line:
+                try:
+                    test_str = line.split(':')[1].strip()
+                    test_str = test_str.replace('%', '')
+                    results['test_accuracy'] = float(test_str) / 100.0
+                except (ValueError, IndexError) as e:
+                    print(f"  Warning: Could not parse test accuracy from: {line}")
+            
+            # Parse best epoch (format: "Best Epoch: 18")
+            elif 'Best Epoch:' in line:
+                try:
+                    epoch_str = line.split(':')[1].strip()
+                    results['best_epoch'] = int(epoch_str)
+                except (ValueError, IndexError) as e:
+                    print(f"  Warning: Could not parse best epoch from: {line}")
+            
+            # Parse train accuracy at best epoch (format: "Training Accuracy at Best Epoch: 91.00%")
+            elif 'Training Accuracy at Best Epoch:' in line:
+                try:
+                    train_str = line.split(':')[1].strip()
+                    train_str = train_str.replace('%', '')
+                    results['train_accuracy_at_best_epoch'] = float(train_str) / 100.0
+                except (ValueError, IndexError) as e:
+                    print(f"  Warning: Could not parse train accuracy from: {line}")
         
+        # Validate we got the key metrics
+        if results['val_accuracy'] is None or results['test_accuracy'] is None:
+            print(f"  Warning: Missing key metrics (val={results['val_accuracy']}, test={results['test_accuracy']})")
+            print(f"  This might indicate the training_summary.txt has an unexpected format")
+            
     except Exception as e:
-        print(f"  Warning: Could not parse results from summary file: {e}")
+        print(f"  ERROR parsing summary file {summary_file}: {e}")
+        import traceback
+        traceback.print_exc()
     
     return results
 
@@ -250,11 +256,16 @@ def run_single_experiment(exp: Dict, args: argparse.Namespace, week4_dir: Path) 
             exp['results']['output_dir'] = str(Path(latest_summary).parent)
             
             if exp['results']['val_accuracy'] is not None:
-                print(f"  ✓ Val Acc: {exp['results']['val_accuracy']:.4f} | "
+                print(f"  ✓ Parsed results successfully:")
+                print(f"    Val Acc: {exp['results']['val_accuracy']:.4f} | "
                       f"Test Acc: {exp['results']['test_accuracy']:.4f} | "
-                      f"Train Acc @ best: {exp['results']['train_accuracy_at_best_epoch']:.4f}")
+                      f"Train Acc @ epoch {exp['results']['best_epoch']}: {exp['results']['train_accuracy_at_best_epoch']:.4f}")
+            else:
+                print(f"  ⚠ Warning: Failed to parse results from summary file!")
+                print(f"    Check {latest_summary} for formatting issues")
         else:
-            print(f"  ⚠ Warning: Could not find summary file")
+            print(f"  ⚠ Warning: Could not find summary file matching pattern:")
+            print(f"    {summary_pattern}")
             exp['results']['error'] = 'Summary file not found'
     
     return exp
