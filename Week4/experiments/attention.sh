@@ -57,15 +57,11 @@ cd /home/mcvstudent29/Week4
 #   - Order: Conv → BN → ReLU → CBAM → Pool
 #
 # PARAMETER OVERHEAD:
-#   Channel Attention (per block): 2 × (C/r × C) params
-#   Spatial Attention (per block): 2 × 7×7 = 98 params
+#   Channel Attention (per block): Uses Conv2d instead of Linear
+#   Spatial Attention (per block): 2-channel conv with 7×7 kernel
 #   
-#   CBAM Block 1 (16 ch):  ~226 params
-#   CBAM Block 2 (32 ch):  ~610 params
-#   CBAM Block 3 (64 ch):  ~2,146 params
-#   CBAM Block 4 (128 ch): ~8,290 params
-#   Total CBAM overhead: ~11,272 params (11.4% increase)
-#   Total model: ~110,224 params (vs 98,952 baseline)
+#   Total CBAM overhead: ~11,000-12,000 params (11-12% increase)
+#   Total model: ~110,000 params (vs 98,952 baseline)
 #
 # PLACEMENT RATIONALE:
 #   - CBAM BEFORE pooling (not after like SE)
@@ -83,7 +79,7 @@ echo "=================================================="
 echo "CBAM Attention Experiment"
 echo "Model: CBAMOptimizedCNN"
 echo "Architecture: [16,32,64,128] + CBAM (r=4, k=7) BEFORE pooling + GAP + direct classification"
-echo "Expected params: ~110,224 (11.4% increase over baseline)"
+echo "Expected params: ~110,000 (11-12% increase over baseline)"
 echo "=================================================="
 
 python main.py \

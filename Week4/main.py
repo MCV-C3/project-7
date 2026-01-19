@@ -10,7 +10,7 @@ import tqdm
 import wandb
 from datetime import datetime
 
-from models import SimpleCNN, FlexibleCNN, OptimizedCNN, build_transforms
+from models import SimpleCNN, FlexibleCNN, OptimizedCNN, SEOptimizedCNN, build_transforms
 from attention_models import CBAMOptimizedCNN
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 
@@ -520,9 +520,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_type",
         type=str,
-        choices=["optimized", "cbam_optimized", "simple", "flexible"],
+        choices=["optimized", "se_optimized", "cbam_optimized", "simple", "flexible"],
         default="optimized",
-        help="Model architecture type: 'optimized' (default, post-experiment baseline), 'cbam_optimized' (with CBAM attention), 'simple' (original SimpleCNN), 'flexible' (configurable architecture)"
+        help="Model architecture type: 'optimized' (default, post-experiment baseline), 'se_optimized' (with SE attention), 'cbam_optimized' (with CBAM attention), 'simple' (original SimpleCNN), 'flexible' (configurable architecture)"
     )
     parser.add_argument(
         "--cbam_reduction",
