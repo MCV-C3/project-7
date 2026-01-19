@@ -78,14 +78,14 @@ cd /home/mcvstudent29/Week4
 echo "=================================================="
 echo "CBAM Attention Experiment"
 echo "Model: CBAMOptimizedCNN"
-echo "Architecture: [16,32,64,128] + CBAM (r=4, k=7) BEFORE pooling + GAP + direct classification"
-echo "Expected params: ~110,000 (11-12% increase over baseline)"
+echo "Architecture: [16,32,64,128] + CBAM (r=16, k=3) BEFORE pooling + GAP + direct classification"
+echo "Expected params: ~105,000 (6% increase over baseline)"
 echo "=================================================="
 
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output/attention \
-    --experiment_name cbam_optimized_r4_k7 \
+    --experiment_name cbam_optimized_r16_k3 \
     --wandb_project C3_Week4_Attention \
     --model_type cbam_optimized \
     --cbam_reduction 16 \
