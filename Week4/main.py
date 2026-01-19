@@ -13,9 +13,10 @@ from datetime import datetime
 from models import SimpleCNN, FlexibleCNN, OptimizedCNN, SEOptimizedCNN, build_transforms
 from attention_models import CBAMOptimizedCNN
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
+from Week4.kl_loss import DistillationLoss
 
 
-def train_epoch(model, dataloader, criterion, optimizer, device):
+def train_epoch(model, dataloader, criterion, optimizer, device, teacher=None):
     """
     Train the model for one epoch.
     
@@ -31,6 +32,8 @@ def train_epoch(model, dataloader, criterion, optimizer, device):
         accuracy (float): Training accuracy
     """
     model.train()
+    if teacher is not None:
+        teacher.eval()
     train_loss = 0.0
     correct, total = 0, 0
 
@@ -39,7 +42,13 @@ def train_epoch(model, dataloader, criterion, optimizer, device):
 
         # Forward pass
         outputs = model(inputs)
-        loss = criterion(outputs, labels)
+
+        if teacher is not None:
+            with torch.no_grad():
+                teacher_outputs = teacher(inputs)
+            loss = criterion(outputs, teacher_outputs, labels)
+        else:
+            loss = criterion(outputs, labels)
 
         # Backward pass and optimization
         optimizer.zero_grad()
@@ -265,9 +274,39 @@ def main(args):
     # Save architecture diagram (visual)
     save_architecture_diagram(model, output_dir, input_size=(1, input_channels, 224, 224))
     
+    # Define teacher model for distillation if enabled
+    teacher = None
+    if args.use_distillation:
+        print("\n[Distillation] Initializing teacher model...")
+    
+        # TODO: definir quins models poden ser teacher (ja posarem el que decidim)
+        if args.teacher_model_type == "optimized":
+            pass
+        elif args.teacher_model_type == "se_optimized":
+            pass
+        elif args.teacher_model_type == "flexible":
+            pass
+        else:
+            raise ValueError("Unsupported teacher model")
+        teacher.load_state_dict(
+            torch.load(args.teacher_checkpoint, map_location=device)
+        )
+        teacher = teacher.to(device)
+        teacher.eval()
+        for p in teacher.parameters():
+            p.requires_grad = False
+        print("[Distillation] Teacher loaded and frozen")
+
     # Define loss function
-    criterion = nn.CrossEntropyLoss()
-    print(f"Loss function: CrossEntropyLoss")
+    if args.use_distillation:
+        criterion = DistillationLoss(
+            temperature=args.distill_temperature,
+            alpha=args.distill_alpha
+        )
+        print(f"Loss function: DistillationLoss (T={args.distill_temperature}, α={args.distill_alpha})")
+    else:
+        criterion = nn.CrossEntropyLoss()
+        print(f"Loss function: CrossEntropyLoss")
     
     # Define optimizer
     print(f"\nSetting up optimizer: {args.optimizer}")
@@ -321,7 +360,7 @@ def main(args):
     
     for epoch in tqdm.tqdm(range(args.epochs), desc="Training"):
         # Train
-        train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
+        train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device, teacher)
         
         # Test
         test_loss, test_acc = test_epoch(model, test_loader, criterion, device)
@@ -585,6 +624,37 @@ if __name__ == "__main__":
         choices=["avg", "max"],
         default="avg",
         help="Type of adaptive pooling: 'avg' or 'max'"
+    )
+    # Distillation parameters
+    parser.add_argument(
+        "--use_distillation",
+        action="store_true",
+        help="Enable knowledge distillation"
+    )
+    parser.add_argument(
+        "--teacher_model_type",
+        type=str,
+        choices=["optimized", "se_optimized", "flexible"],
+        default="se_optimized",
+        help="Teacher model architecture"
+    )
+    parser.add_argument(
+        "--teacher_checkpoint",
+        type=str,
+        default="",
+        help="Path to pretrained teacher checkpoint (.pt)"
+    )
+    parser.add_argument(
+        "--distill_alpha",
+        type=float,
+        default=0.5,
+        help="Weight for distillation loss"
+    )
+    parser.add_argument(
+        "--distill_temperature",
+        type=float,
+        default=4.0,
+        help="Temperature for distillation"
     )
     
     args = parser.parse_args()
