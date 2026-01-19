@@ -88,8 +88,8 @@ python main.py \
     --experiment_name cbam_optimized_r4_k7 \
     --wandb_project C3_Week4_Attention \
     --model_type cbam_optimized \
-    --cbam_reduction 4 \
-    --cbam_spatial_kernel 7 \
+    --cbam_reduction 16 \
+    --cbam_spatial_kernel 3 \
     --batch_size 16 \
     --epochs 20 \
     --learning_rate 1e-3 \
