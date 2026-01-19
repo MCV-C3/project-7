@@ -19,7 +19,7 @@ export WANDB_DIR=/data/uabmcv2526/mcvstudent29/Week4/wandb/attention
 cd /home/mcvstudent29/Week4
 
 # ============================================================================
-# SQUEEZE-AND-EXCITATION ATTENTION EXPERIMENT
+# CBAM (CONVOLUTIONAL BLOCK ATTENTION MODULE) EXPERIMENT
 # ============================================================================
 #
 # BASELINE CONTEXT:
@@ -31,37 +31,47 @@ cd /home/mcvstudent29/Week4
 #
 # MOTIVATION:
 #   With minimal overfitting (2.88% gap), we have headroom to add model capacity
-#   through attention mechanisms. Channel attention (SE blocks) can improve
-#   feature discrimination without significantly increasing overfitting risk.
+#   through attention mechanisms. CBAM provides dual attention (channel + spatial)
+#   which is particularly effective for scene recognition tasks.
 #
-# SQUEEZE-AND-EXCITATION (SE) MECHANISM:
-#   SE blocks add channel attention after each convolutional block:
-#   1. Squeeze: Global average pooling to aggregate spatial information
-#   2. Excitation: Two FC layers to learn channel interdependencies
-#   3. Scale: Multiply features by learned channel-wise weights
+# CBAM MECHANISM:
+#   CBAM sequentially applies two attention modules BEFORE pooling:
+#   1. Channel Attention:
+#      - Uses both avg & max pooling (richer than SE's avg-only)
+#      - Learns 'what' is meaningful
+#   2. Spatial Attention:
+#      - Aggregates channel info via avg & max along channel axis
+#      - 7×7 conv learns 'where' is meaningful
+#      - Requires spatial resolution → applied BEFORE pooling
 #
-#   This allows the network to:
-#   - Emphasize important feature channels
-#   - Suppress irrelevant channels
-#   - Adapt attention dynamically per image
+#   Benefits over SE:
+#   - Dual attention: both 'what' (channel) and 'where' (spatial)
+#   - Better spatial awareness for scene recognition
+#   - Richer feature aggregation (avg + max pooling)
 #
-# ARCHITECTURE: SEOptimizedCNN
+# ARCHITECTURE: CBAMOptimizedCNN
 #   - Base: Same as OptimizedCNN ([16,32,64,128] + GAP + direct classification)
-#   - Addition: SE blocks after each of 4 conv blocks
-#   - SE reduction ratio: 4 (standard for small networks)
+#   - Addition: CBAM blocks BEFORE pooling in each of 4 conv blocks
+#   - Channel reduction ratio: 4 (standard for small networks)
+#   - Spatial kernel size: 7 (standard CBAM configuration)
+#   - Order: Conv → BN → ReLU → CBAM → Pool
 #
 # PARAMETER OVERHEAD:
-#   SE Block 1 (16 ch):  16×4 + 4×16 = 128 params
-#   SE Block 2 (32 ch):  32×8 + 8×32 = 512 params
-#   SE Block 3 (64 ch):  64×16 + 16×64 = 2,048 params
-#   SE Block 4 (128 ch): 128×32 + 32×128 = 8,192 params
-#   Total SE overhead: ~10,880 params (11% increase)
-#   Total model: ~109,832 params (vs 98,952 baseline)
+#   Channel Attention (per block): 2 × (C/r × C) params
+#   Spatial Attention (per block): 2 × 7×7 = 98 params
+#   
+#   CBAM Block 1 (16 ch):  ~226 params
+#   CBAM Block 2 (32 ch):  ~610 params
+#   CBAM Block 3 (64 ch):  ~2,146 params
+#   CBAM Block 4 (128 ch): ~8,290 params
+#   Total CBAM overhead: ~11,272 params (11.4% increase)
+#   Total model: ~110,224 params (vs 98,952 baseline)
 #
-# SYNERGY WITH BASELINE:
-#   - GAP already uses global pooling (spatial → channel aggregation)
-#   - SE blocks use same principle but throughout the network
-#   - Philosophically aligned → natural integration
+# PLACEMENT RATIONALE:
+#   - CBAM BEFORE pooling (not after like SE)
+#   - Spatial attention needs spatial resolution to be effective
+#   - Pooling discards spatial info that spatial attention needs
+#   - Follows CBAM paper's recommended practice (ECCV 2018)
 #
 # TRAINING CONFIGURATION:
 #   - Same as OptimizedCNN baseline for fair comparison
@@ -70,19 +80,20 @@ cd /home/mcvstudent29/Week4
 # ============================================================================
 
 echo "=================================================="
-echo "SE Attention Experiment"
-echo "Model: SEOptimizedCNN"
-echo "Architecture: [16,32,64,128] + SE blocks (reduction=4) + GAP + direct classification"
-echo "Expected params: ~109,832 (11% increase over baseline)"
+echo "CBAM Attention Experiment"
+echo "Model: CBAMOptimizedCNN"
+echo "Architecture: [16,32,64,128] + CBAM (r=4, k=7) BEFORE pooling + GAP + direct classification"
+echo "Expected params: ~110,224 (11.4% increase over baseline)"
 echo "=================================================="
 
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output/attention \
-    --experiment_name se_optimized_r4 \
+    --experiment_name cbam_optimized_r4_k7 \
     --wandb_project C3_Week4_Attention \
-    --model_type se_optimized \
-    --se_reduction 4 \
+    --model_type cbam_optimized \
+    --cbam_reduction 4 \
+    --cbam_spatial_kernel 7 \
     --batch_size 16 \
     --epochs 20 \
     --learning_rate 1e-3 \
@@ -93,7 +104,7 @@ python main.py \
     --num_workers 8
 
 echo "=================================================="
-echo "Experiment completed!"
+echo "CBAM Experiment completed!"
 echo "Results saved to: /data/uabmcv2526/mcvstudent29/Week4/output/attention"
 echo "W&B logs: /data/uabmcv2526/mcvstudent29/Week4/wandb/attention"
 echo "=================================================="
