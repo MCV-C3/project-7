@@ -53,17 +53,18 @@ class SpatialAttention(nn.Module):
     Focuses on 'where' is important by aggregating channel information.
     """
     
-    def __init__(self, kernel_size: int = 7):
+    def __init__(self, kernel_size: int = 7, dilation: int = 1):
         """
         Initialize Spatial Attention.
         
         Args:
             kernel_size (int): Kernel size for conv layer (default: 7)
+            dilation (int): Dilation rate for convolution (default: 1)
         """
         super(SpatialAttention, self).__init__()
         
-        padding = kernel_size // 2
-        self.conv = nn.Conv2d(2, 1, kernel_size=kernel_size, padding=padding, bias=False)
+        padding = ((kernel_size - 1) // 2) * dilation
+        self.conv = nn.Conv2d(2, 1, kernel_size=kernel_size, padding=padding, dilation=dilation, bias=False)
         self.sigmoid = nn.Sigmoid()
     
     def forward(self, x):
@@ -89,7 +90,7 @@ class CBAMBlock(nn.Module):
     Paper: "CBAM: Convolutional Block Attention Module" (Woo et al., ECCV 2018)
     """
     
-    def __init__(self, channels: int, reduction: int = 4, kernel_size: int = 7):
+    def __init__(self, channels: int, reduction: int = 4, kernel_size: int = 7, dilation: int = 1):
         """
         Initialize CBAM block.
         
@@ -97,11 +98,12 @@ class CBAMBlock(nn.Module):
             channels (int): Number of input channels
             reduction (int): Reduction ratio for channel attention (default: 4)
             kernel_size (int): Kernel size for spatial attention (default: 7)
+            dilation (int): Dilation rate for spatial attention (default: 1)
         """
         super(CBAMBlock, self).__init__()
         
         self.channel_attention = ChannelAttention(channels, reduction)
-        self.spatial_attention = SpatialAttention(kernel_size)
+        self.spatial_attention = SpatialAttention(kernel_size, dilation)
     
     def forward(self, x):
         """
@@ -136,7 +138,9 @@ class CBAMOptimizedCNN(nn.Module):
     """
     
     def __init__(self, num_classes: int = 8, input_channels: int = 3, 
-                 dropout: float = 0.3, reduction: int = 4, spatial_kernel: int = 7):
+                 dropout: float = 0.3, reduction: int = 4,
+                 spatial_kernel: int = 7, spatial_dilation: int = 1,
+                 num_cbam_blocks: int = 4):
         """
         Initialize CBAMOptimizedCNN with dual attention.
         
@@ -148,6 +152,15 @@ class CBAMOptimizedCNN(nn.Module):
             spatial_kernel (int): Kernel size for spatial attention (default: 7)
         """
         super(CBAMOptimizedCNN, self).__init__()
+
+        # Use cbam
+        assert 0 <= num_cbam_blocks <= 4 and type(num_cbam_blocks) == int
+        self.use_cbam = [
+            num_cbam_blocks >= 4,
+            num_cbam_blocks >= 3,
+            num_cbam_blocks >= 2,
+            num_cbam_blocks >= 1,
+        ]
         
         # Convolutional Block 1: 3 -> 16 channels (with CBAM before pooling)
         self.conv1 = nn.Sequential(
@@ -223,22 +236,26 @@ class CBAMOptimizedCNN(nn.Module):
         """
         # Block 1: Conv -> CBAM -> Pool
         x = self.conv1(x)
-        x = self.cbam1(x)  # Dual attention before pooling
+        if self.use_cbam[0]:
+            x = self.cbam1(x)  # Dual attention before pooling
         x = self.pool1(x)
         
         # Block 2: Conv -> CBAM -> Pool
         x = self.conv2(x)
-        x = self.cbam2(x)  # Dual attention before pooling
+        if self.use_cbam[1]:
+            x = self.cbam2(x)  # Dual attention before pooling
         x = self.pool2(x)
         
         # Block 3: Conv -> CBAM -> Pool
         x = self.conv3(x)
-        x = self.cbam3(x)  # Dual attention before pooling
+        if self.use_cbam[2]:
+            x = self.cbam3(x)  # Dual attention before pooling
         x = self.pool3(x)
         
         # Block 4: Conv -> CBAM -> Pool
         x = self.conv4(x)
-        x = self.cbam4(x)  # Dual attention before pooling
+        if self.use_cbam[3]:
+            x = self.cbam4(x)  # Dual attention before pooling
         x = self.pool4(x)
         
         # Global Average Pooling

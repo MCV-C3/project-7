@@ -13,7 +13,7 @@ from datetime import datetime
 from models import SimpleCNN, FlexibleCNN, OptimizedCNN, build_transforms
 from attention_models import CBAMOptimizedCNN
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
-from Week4.kl_loss import DistillationLoss
+from kl_loss import DistillationLoss
 
 
 def train_epoch(model, dataloader, criterion, optimizer, device, teacher=None):
@@ -232,7 +232,9 @@ def main(args):
             input_channels=input_channels,
             dropout=args.dropout,
             reduction=args.cbam_reduction,
-            spatial_kernel=args.cbam_spatial_kernel
+            spatial_kernel=args.cbam_spatial_kernel,
+            spatial_dilation=args.cbam_dilation,
+            num_cbam_blocks=args.cbam_num_blocks,
         )
     elif args.model_type == 'simple':
         model = SimpleCNN(
@@ -574,6 +576,18 @@ if __name__ == "__main__":
         type=int,
         default=7,
         help="Kernel size for spatial attention in CBAMOptimizedCNN (default: 7)"
+    )
+    parser.add_argument(
+        "--cbam_dilation",
+        type=int,
+        default=1,
+        help="Dilation size for spatial attention in CBAMOptimizedCNN (default: 1)"
+    )
+    parser.add_argument(
+        "--cbam_num_blocks",
+        type=int,
+        default=4,
+        help="Number of CBAM blocks to include in CBAMOptimizedCNN (0-4, default: 4)"
     )
     parser.add_argument(
         "--channels",
