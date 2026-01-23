@@ -29,6 +29,8 @@ def plot_metrics(train_metrics: Dict, test_metrics: Dict, metric_name: str, outp
     plt.title(f'{metric_name.capitalize()} Over Epochs', fontsize=14)
     plt.legend()
     plt.grid(True, alpha=0.3)
+    if metric_name.lower() in ["accuracy", "acc"]:
+        plt.ylim(0, 1)
 
     # Save the plot with the appropriate name
     filename = f"{metric_name}.png"
