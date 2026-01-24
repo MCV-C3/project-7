@@ -168,7 +168,7 @@ class CBAMOptimizedCNN(nn.Module):
             nn.BatchNorm2d(16),
             nn.ReLU()
         )
-        self.cbam1 = CBAMBlock(16, reduction=reduction, kernel_size=spatial_kernel)
+        self.cbam1 = CBAMBlock(16, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)  # 224 -> 112
         
         # Convolutional Block 2: 16 -> 32 channels (with CBAM before pooling)
@@ -177,7 +177,7 @@ class CBAMOptimizedCNN(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU()
         )
-        self.cbam2 = CBAMBlock(32, reduction=reduction, kernel_size=spatial_kernel)
+        self.cbam2 = CBAMBlock(32, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)  # 112 -> 56
         
         # Convolutional Block 3: 32 -> 64 channels (with CBAM before pooling)
@@ -186,7 +186,7 @@ class CBAMOptimizedCNN(nn.Module):
             nn.BatchNorm2d(64),
             nn.ReLU()
         )
-        self.cbam3 = CBAMBlock(64, reduction=reduction, kernel_size=spatial_kernel)
+        self.cbam3 = CBAMBlock(64, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)  # 56 -> 28
         
         # Convolutional Block 4: 64 -> 128 channels (with CBAM before pooling)
@@ -195,7 +195,7 @@ class CBAMOptimizedCNN(nn.Module):
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
-        self.cbam4 = CBAMBlock(128, reduction=reduction, kernel_size=spatial_kernel)
+        self.cbam4 = CBAMBlock(128, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)  # 28 -> 14
         
         # Global Average Pooling (1×1)
