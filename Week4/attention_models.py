@@ -162,40 +162,44 @@ class CBAMOptimizedCNN(nn.Module):
             num_cbam_blocks >= 1,
         ]
         
-        # Convolutional Block 1: 3 -> 16 channels (with CBAM before pooling)
+        # Convolutional Block 1: 3 -> 16 channels (with optional CBAM before pooling)
         self.conv1 = nn.Sequential(
             nn.Conv2d(input_channels, 16, kernel_size=3, padding=1),
             nn.BatchNorm2d(16),
             nn.ReLU()
         )
-        self.cbam1 = CBAMBlock(16, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
+        if self.use_cbam[0]:
+            self.cbam1 = CBAMBlock(16, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)  # 224 -> 112
         
-        # Convolutional Block 2: 16 -> 32 channels (with CBAM before pooling)
+        # Convolutional Block 2: 16 -> 32 channels (with optional CBAM before pooling)
         self.conv2 = nn.Sequential(
             nn.Conv2d(16, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU()
         )
-        self.cbam2 = CBAMBlock(32, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
+        if self.use_cbam[1]:
+            self.cbam2 = CBAMBlock(32, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)  # 112 -> 56
         
-        # Convolutional Block 3: 32 -> 64 channels (with CBAM before pooling)
+        # Convolutional Block 3: 32 -> 64 channels (with optional CBAM before pooling)
         self.conv3 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU()
         )
-        self.cbam3 = CBAMBlock(64, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
+        if self.use_cbam[2]:
+            self.cbam3 = CBAMBlock(64, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)  # 56 -> 28
         
-        # Convolutional Block 4: 64 -> 128 channels (with CBAM before pooling)
+        # Convolutional Block 4: 64 -> 128 channels (with optional CBAM before pooling)
         self.conv4 = nn.Sequential(
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
-        self.cbam4 = CBAMBlock(128, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
+        if self.use_cbam[3]:
+            self.cbam4 = CBAMBlock(128, reduction=reduction, kernel_size=spatial_kernel, dilation=spatial_dilation)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)  # 28 -> 14
         
         # Global Average Pooling (1×1)
@@ -236,25 +240,25 @@ class CBAMOptimizedCNN(nn.Module):
         """
         # Block 1: Conv -> CBAM -> Pool
         x = self.conv1(x)
-        if self.use_cbam[0]:
+        if hasattr(self, 'cbam1'):
             x = self.cbam1(x)  # Dual attention before pooling
         x = self.pool1(x)
         
         # Block 2: Conv -> CBAM -> Pool
         x = self.conv2(x)
-        if self.use_cbam[1]:
+        if hasattr(self, 'cbam2'):
             x = self.cbam2(x)  # Dual attention before pooling
         x = self.pool2(x)
         
         # Block 3: Conv -> CBAM -> Pool
         x = self.conv3(x)
-        if self.use_cbam[2]:
+        if hasattr(self, 'cbam3'):
             x = self.cbam3(x)  # Dual attention before pooling
         x = self.pool3(x)
         
         # Block 4: Conv -> CBAM -> Pool
         x = self.conv4(x)
-        if self.use_cbam[3]:
+        if hasattr(self, 'cbam4'):
             x = self.cbam4(x)  # Dual attention before pooling
         x = self.pool4(x)
         
