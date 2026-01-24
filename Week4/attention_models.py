@@ -43,7 +43,7 @@ class ChannelAttention(nn.Module):
         # Combine and apply sigmoid (stays in conv format)
         out = self.sigmoid(avg_out + max_out)
         
-        return x * out
+        return  * out
 
 
 class SpatialAttention(nn.Module):

@@ -39,7 +39,7 @@ find .. -type f -name '*.pyc' -delete 2>/dev/null || true
 python hyperparameter_optimization.py \
     --dataset_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output/hyperopt/ \
-    --n_trials 80 \
+    --n_trials 60 \
     --study_name week4_hyperopt_$(date +%Y%m%d_%H%M%S) \
     --wandb_project C3_Week4_HyperOpt
 
