@@ -28,7 +28,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 from torchvision.datasets import ImageFolder
 import optuna
 from optuna.trial import Trial
@@ -40,6 +40,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models import build_transforms
 from attention_models import CBAMOptimizedCNN
+from augmented_subset import AugmentedSubset
 
 
 # ==================== Training Functions ====================
@@ -140,7 +141,7 @@ def evaluate(
 
 
 def train_and_evaluate_on_test(
-    train_dataset: ImageFolder,
+    train_dataset_path: str,
     test_dataset: ImageFolder,
     batch_size: int,
     epochs: int,
@@ -153,10 +154,10 @@ def train_and_evaluate_on_test(
     max_grad_norm: float = 0.0
 ) -> Dict[str, float]:
     """
-    Train on full train set and evaluate on test set.
+    Train on full train set with fixed data augmentation and evaluate on test set.
     
     Args:
-        train_dataset: Full training dataset
+        train_dataset_path: Path to training dataset directory
         test_dataset: Test dataset
         batch_size: Batch size for data loaders
         epochs: Number of training epochs
@@ -170,9 +171,36 @@ def train_and_evaluate_on_test(
     Returns:
         Dictionary with train and test metrics
     """
+    # Create base training dataset
+    base_train_dataset = ImageFolder(
+        root=train_dataset_path,
+        transform=build_transforms(train=True)
+    )
+    
+    # Create augmented training dataset with fixed augmentation parameters
+    aug_ratio = 1.5
+    augmented_size = int(len(base_train_dataset) * aug_ratio)
+    augmented_dataset = ImageFolder(
+        root=train_dataset_path,
+        transform=build_transforms(
+            train=True,
+            use_flip=True,
+            use_color=True,
+            use_geometric=True,
+            use_translation=True,
+        )
+    )
+    
+    # Combine base and augmented datasets
+    train_datasets = [
+        base_train_dataset,
+        AugmentedSubset(augmented_dataset, augmented_size)
+    ]
+    combined_train_dataset = ConcatDataset(train_datasets)
+    
     # Create data loaders
     train_loader = DataLoader(
-        train_dataset,
+        combined_train_dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=4,
@@ -254,19 +282,19 @@ def train_and_evaluate_on_test(
 
 def objective(
     trial: Trial,
-    train_dataset: ImageFolder,
+    train_dataset_path: str,
     test_dataset: ImageFolder,
     device: torch.device
 ) -> Tuple[float, float]:
     """
     Optuna objective function for multi-objective optimization.
     
-    This function suggests hyperparameters, trains on train set,
+    This function suggests hyperparameters, trains on train set with fixed data augmentation,
     and evaluates on test set to return two objectives.
     
     Args:
         trial: Optuna trial object
-        train_dataset: Training dataset
+        train_dataset_path: Path to training dataset directory
         test_dataset: Test dataset
         device: Device to train on
         
@@ -292,11 +320,12 @@ def objective(
     print(f"  batch_size={batch_size}, epochs={epochs}, optimizer={optimizer_name}")
     print(f"  learning_rate={learning_rate:.6f}, momentum={momentum:.3f}, "
           f"weight_decay={weight_decay:.6f}, dropout={dropout:.3f}, max_grad_norm={max_grad_norm}")
+    print(f"  Fixed data augmentation: flip=True, color=True, geometric=True, translation=True, aug_ratio=1.5")
     
-    # Train on full train set and evaluate on test set (no cross-validation)
-    print(f"\n  Training on full train set and evaluating on test set")
+    # Train on full train set with fixed data augmentation and evaluate on test set
+    print(f"\n  Training on train set with data augmentation and evaluating on test set")
     test_results = train_and_evaluate_on_test(
-        train_dataset=train_dataset,
+        train_dataset_path=train_dataset_path,
         test_dataset=test_dataset,
         batch_size=batch_size,
         epochs=epochs,
@@ -381,16 +410,24 @@ def main():
     print(f"Using device: {device}")
     
     # Load datasets
-    train_transform = build_transforms(train=True)
     test_transform = build_transforms(train=False)
     
     train_dataset_path = os.path.join(args.dataset_root, 'train')
     test_dataset_path = os.path.join(args.dataset_root, 'test')
     
-    train_dataset = ImageFolder(root=train_dataset_path, transform=train_transform)
+    # Load test dataset for evaluation
     test_dataset = ImageFolder(root=test_dataset_path, transform=test_transform)
     
-    print(f"Loaded training dataset with {len(train_dataset)} samples from {train_dataset_path}")
+    # Check train dataset size for info
+    temp_train_dataset = ImageFolder(root=train_dataset_path, transform=build_transforms(train=True))
+    base_train_size = len(temp_train_dataset)
+    aug_ratio = 1.5
+    augmented_size = int(base_train_size * aug_ratio)
+    total_train_size = base_train_size + augmented_size
+    
+    print(f"Base training dataset: {base_train_size} samples from {train_dataset_path}")
+    print(f"Augmented samples: {augmented_size} (ratio: {aug_ratio})")
+    print(f"Total training samples: {total_train_size}")
     print(f"Loaded test dataset with {len(test_dataset)} samples from {test_dataset_path}")
     
     # Initialize Weights & Biases
@@ -401,9 +438,16 @@ def main():
             'n_trials': args.n_trials,
             'model': 'CBAMOptimizedCNN',
             'cbam_reduction': 4,
-            'cbam_kernel': 5,
+            'cbam_spatial_kernel': 5,
             'cbam_dilation': 1,
             'cbam_num_blocks': 1,
+            'use_flip': True,
+            'use_color': True,
+            'use_geometric': True,
+            'use_translation': True,
+            'aug_ratio': aug_ratio,
+            'base_train_size': base_train_size,
+            'total_train_size': total_train_size,
         }
     )
     
@@ -419,7 +463,7 @@ def main():
     
     # Run optimization
     study.optimize(
-        lambda trial: objective(trial, train_dataset, test_dataset, device),
+        lambda trial: objective(trial, train_dataset_path, test_dataset, device),
         n_trials=args.n_trials,
         show_progress_bar=True
     )

@@ -19,38 +19,41 @@ export WANDB_DIR=/data/uabmcv2526/mcvstudent29/Week4/wandb
 cd /home/mcvstudent29/Week4
 
 # ============================================================================
-# OPTIMIZED BASELINE CONFIGURATION
-# After Architecture Search + Adaptive Pooling Regularization Experiments
+# OPTIMIZED BASELINE WITH CBAM ATTENTION + DATA AUGMENTATION
+# Fixed Configuration for Hyperparameter Optimization Baseline
 # ============================================================================
 # Dataset: MIT Scenes with 50 images/class (400 total training images)
 # 
-# Architecture Evolution:
-# 1. Original baseline: [32,64,128,256], 7×7 pooling, FC512 → 66.17% test acc, 28.58% train-test gap
-# 2. Arch search winner: [16,32,64,128] narrow channels → 74.13% test acc, 19.62% gap
-# 3. Adaptive pooling winner: GAP (1×1) + direct classification → 75.87% test acc, 2.88% gap
+# Architecture: CBAMOptimizedCNN with fixed attention parameters
+# - Base channels: [16,32,64,128] (optimized from architecture search)
+# - CBAM attention: Fixed optimal configuration
+#   * Reduction ratio: 4 (channel attention efficiency)
+#   * Spatial kernel: 5 (spatial attention coverage)
+#   * Dilation: 1 (standard convolution)
+#   * Num blocks: 1 (minimal attention overhead)
+# - Adaptive pooling: (1,1) Global Average Pooling
+# - FC config: Direct classification (128 → 8)
 # 
-# Current Architecture (gap_avg_direct):
-# - Channels: [16,32,64,128] (50% narrower than original, reduces conv overfitting)
-# - Adaptive pooling: (1,1) Global Average Pooling (eliminates spatial redundancy)
-# - Pooling type: avg (smoother aggregation than max)
-# - FC config: Direct classification (128 → 8, no hidden layer)
-# - FC parameters: 1,032 (vs 3.2M in original baseline = 3,116× reduction)
+# Data Augmentation: Fixed optimal configuration (1.5x augmentation ratio)
+# - Horizontal flip: Enabled (geometric invariance)
+# - Color jitter: Enabled (lighting robustness)
+# - Geometric transforms: Enabled (rotation/scaling robustness)
+# - Translation: Enabled (positional invariance)
+# - Aug ratio: 1.5 (600 total training samples: 400 base + 200 augmented)
 # 
-# Key advantages:
-# - Minimal overfitting (2.88% train-test gap vs 28.58% original)
-# - 576× fewer FC params than pool3x3 runner-up
-# - Follows modern CNN best practices (ResNet, EfficientNet pattern)
-# - Provides headroom for data augmentation and attention mechanisms
+# Training settings (standard hyperparameters):
+# - batch_size=16, lr=1e-3, AdamW, weight_decay=1e-4, dropout=0.3, epochs=20
 # 
-# Training settings (unchanged from original baseline):
-# - batch_size=16, lr=1e-3, AdamW, weight_decay=1e-4, dropout=0.3
+# This configuration matches the fixed parameters used in hyperparameter optimization
+# for consistent baseline evaluation with attention mechanisms and data augmentation.
 # ============================================================================
 
 python main.py \
     --data_root /data/uabmcv2526/shared/dataset/2425/MIT_small_train_1 \
     --output_dir /data/uabmcv2526/mcvstudent29/Week4/output \
-    --experiment_name optimized_baseline \
+    --experiment_name cbam_baseline_with_augmentation \
     --wandb_project C3_Week4 \
+    --model_type cbam_optimized \
     --batch_size 16 \
     --epochs 20 \
     --learning_rate 1e-3 \
@@ -58,7 +61,19 @@ python main.py \
     --optimizer AdamW \
     --dropout 0.3 \
     --seed 42 \
-    --num_workers 8
+    --num_workers 8 \
+    --cbam_reduction 4 \
+    --cbam_spatial_kernel 5 \
+    --cbam_dilation 1 \
+    --cbam_num_blocks 1 \
+    --use_flip \
+    --use_color \
+    --use_geometric \
+    --use_translation \
+    --aug_ratio 1.5
     
-# Note: --model_type defaults to 'optimized' (no need to specify)
-# OptimizedCNN has fixed architecture: [16,32,64,128] + GAP + direct classification
+# Configuration Summary:
+# - Model: CBAMOptimizedCNN with fixed optimal CBAM parameters
+# - Data Augmentation: All enabled with 1.5x ratio (600 total training samples)
+# - Training: Standard hyperparameters from previous experiments
+# - This matches the fixed configuration used in hyperparameter optimization
