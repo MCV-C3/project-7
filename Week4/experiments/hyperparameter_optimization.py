@@ -254,6 +254,7 @@ def train_and_evaluate_on_test(
     final_train_acc = 0.0
     final_test_acc = 0.0
     final_test_loss = 0.0
+    best_epoch = 0
     
     for epoch in range(epochs):
         train_loss, train_acc = train_one_epoch(
@@ -269,12 +270,14 @@ def train_and_evaluate_on_test(
             final_train_acc = train_acc
             final_test_acc = test_acc
             final_test_loss = test_loss
+            best_epoch = epoch + 1  # +1 for 1-based indexing
     
     return {
         'train_acc': final_train_acc,
         'test_acc': final_test_acc,
         'test_loss': final_test_loss,
-        'overfitting': final_train_acc - final_test_acc
+        'overfitting': abs(final_train_acc - final_test_acc),  # Absolute difference - both directions are bad
+        'best_epoch': best_epoch
     }
 
 
@@ -345,9 +348,10 @@ def objective(
     overfitting = test_results['overfitting']
     
     print(f"\nTrial {trial.number} Results:")
-    print(f"  Final Train Acc: {test_results['train_acc']:.4f}")
-    print(f"  Final Test Acc: {test_results['test_acc']:.4f}")
-    print(f"  Final Overfitting: {overfitting:.4f}")
+    print(f"  Best epoch: {test_results['best_epoch']}/{epochs}")
+    print(f"  Final Train Acc: {test_results['train_acc']:.4f} (at best epoch)")
+    print(f"  Final Test Acc: {test_results['test_acc']:.4f} (best across all epochs)")
+    print(f"  Final Overfitting: {overfitting:.4f} (train-test gap at best epoch)")
     
     # Return tuple: (objective1, objective2)
     # Optuna will maximize test_acc and minimize overfitting
