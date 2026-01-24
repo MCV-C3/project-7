@@ -3,7 +3,7 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 from torchvision.datasets import ImageFolder
 import numpy as np
 import tqdm
@@ -14,6 +14,7 @@ from models import SimpleCNN, FlexibleCNN, OptimizedCNN, build_transforms
 from attention_models import CBAMOptimizedCNN
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 from kl_loss import DistillationLoss
+from augmented_subset import AugmentedSubset
 
 
 def train_epoch(model, dataloader, criterion, optimizer, device, teacher=None):
@@ -159,6 +160,11 @@ def main(args):
             "momentum": args.momentum,
             "dropout": args.dropout,
             "seed": args.seed,
+            "use_flip": args.use_flip,
+            "use_color": args.use_color,
+            "use_geometric": args.use_geometric,
+            "use_translation": args.use_translation,
+            "aug_ratio": args.aug_ratio,
         }
     )
     
@@ -167,18 +173,37 @@ def main(args):
     print(f"Using device: {device}")
     
     # Build transforms
-    train_transform = build_transforms(train=True)
+
     test_transform = build_transforms(train=False)
     
     # Load datasets
     print(f"Loading datasets from {args.data_root}")
-    train_dataset = ImageFolder(
+    base_train_dataset = ImageFolder(
         root=os.path.join(args.data_root, 'train'),
-        transform=train_transform
+        transform=build_transforms(train=True)
     )
+    train_datasets = [base_train_dataset]
+    augmented_size = None
+    if args.aug_ratio > 0:
+        augmented_size = int(len(base_train_dataset) * args.aug_ratio)
+        augmented_dataset = ImageFolder(
+            root=os.path.join(args.data_root, 'train'),
+            transform=build_transforms(
+                train=True,
+                use_flip=args.use_flip,
+                use_color=args.use_color,
+                use_geometric=args.use_geometric,
+                use_translation=args.use_translation,
+            )
+        )
+        train_datasets.append(
+            AugmentedSubset(augmented_dataset, augmented_size)
+        )
+    train_dataset = ConcatDataset(train_datasets)
+
     test_dataset = ImageFolder(
         root=os.path.join(args.data_root, 'test'),
-        transform=test_transform
+        transform=build_transforms(train=False)
     )
     
     # Create data loaders
@@ -202,8 +227,8 @@ def main(args):
     print("=" * 70)
     print(f"Train samples: {len(train_dataset)}")
     print(f"Test samples: {len(test_dataset)}")
-    print(f"Number of classes: {len(train_dataset.classes)}")
-    print(f"Classes: {train_dataset.classes}")
+    # print(f"Number of classes: {len(train_dataset.classes)}")
+    # print(f"Classes: {train_dataset.classes}")
     print(f"Batch size: {args.batch_size}")
     print(f"Train batches: {len(train_loader)}")
     print(f"Test batches: {len(test_loader)}")
@@ -216,7 +241,7 @@ def main(args):
     print("=" * 70 + "\n")
     
     # Create model
-    num_classes = len(train_dataset.classes)
+    num_classes = 8
     print("Creating model...")
     
     # Choose model type based on argument
@@ -355,6 +380,12 @@ def main(args):
     best_epoch = 0
     train_acc_at_best = 0.0
     model_path = os.path.join(output_dir, "best_model.pt")
+
+    # Print dataset sizes
+    print(f"Train samples (original): {len(base_train_dataset)}")
+    print(f"Train samples (augmented): {augmented_size if args.aug_ratio > 0 else 0}")
+    print(f"Train samples (total): {len(train_dataset)}")
+
     
     print("\n" + "=" * 70)
     print(f"STARTING TRAINING - {args.epochs} EPOCHS")
@@ -418,8 +449,18 @@ def main(args):
     print(f"Final test accuracy: {final_acc:.4f}")
     
     # Plot confusion matrix
+    class_names = [
+        "Opencountry",
+        "coast",
+        "forest",
+        "highway",
+        "inside_city",
+        "mountain",
+        "street",
+        "tallbuilding"
+    ]
     plot_confusion_matrix(
-        y_true, y_pred, train_dataset.classes, output_dir
+        y_true, y_pred, class_names, output_dir
     )
     
     # Plot metrics
@@ -670,6 +711,13 @@ if __name__ == "__main__":
         default=4.0,
         help="Temperature for distillation"
     )
+    # Data augmentation
+    parser.add_argument("--use_flip", action="store_true")
+    parser.add_argument("--use_color", action="store_true")
+    parser.add_argument("--use_geometric", action="store_true")
+    parser.add_argument("--use_translation", action="store_true")
+    parser.add_argument("--aug_ratio", type=float, default=1.0)
+
     
     args = parser.parse_args()
     main(args)

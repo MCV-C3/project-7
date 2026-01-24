@@ -372,7 +372,12 @@ class FlexibleCNN(nn.Module):
         return x
 
 
-def build_transforms(train: bool = True) -> transforms.Compose:
+def build_transforms(train: bool = True,
+                     use_flip=False,
+                     use_color=False,
+                     use_geometric=False,
+                     use_translation=False,
+    ) -> transforms.Compose:
     """
     Build image transformations for training or testing.
     
@@ -382,17 +387,50 @@ def build_transforms(train: bool = True) -> transforms.Compose:
     Returns:
         transforms.Compose: Composed transforms
     """
+    transforms_list = []
     if train:
-        return transforms.Compose([
-            transforms.ToImage(),
-            transforms.ToDtype(torch.float32, scale=True),
-            transforms.Resize((224, 224)),
-        ])
-    else:
-        return transforms.Compose([
-            transforms.ToImage(),
-            transforms.ToDtype(torch.float32, scale=True),
-            transforms.Resize((224, 224)),
-        ])
+        if use_flip:
+            transforms_list.append(
+                transforms.RandomHorizontalFlip(p=0.5)
+            )
+
+        if use_color:
+            transforms_list.append(
+                transforms.ColorJitter(
+                    brightness=0.2,
+                    contrast=0.2,
+                    saturation=0.2,
+                    hue=0.05
+                )
+            )
+
+        if use_geometric:
+            transforms_list.append(
+                    transforms.RandomAffine(
+                    degrees=10,
+                    scale=(0.9, 1.1),
+                    shear=5
+                )
+            )
+
+        if use_translation:
+            transforms_list.append(
+                    transforms.RandomAffine(
+                        degrees=0,
+                        translate=(0.1, 0.1)
+                )
+            )
+
+    # Base transforms for train and test
+    transforms_list += [
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ]
+
+    return transforms.Compose(transforms_list)
 
 
