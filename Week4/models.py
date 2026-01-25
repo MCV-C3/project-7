@@ -6,17 +6,6 @@ from typing import List
 
 
 class OptimizedCNN(nn.Module):
-    """
-    Optimized CNN architecture after architecture search + adaptive pooling experiments.
-    
-    Key design decisions validated through systematic experiments:
-    - Narrow channels [16,32,64,128]: Reduces conv overfitting (from arch search)
-    - Global Average Pooling (1×1): Eliminates spatial redundancy, reduces FC params
-    - Direct classification: No hidden FC layer (128 → 8), minimal overfitting
-    
-    Performance: 75.87% test acc, 2.88% train-test gap, 98,952 total params
-    Baseline comparison: Original SimpleCNN had 28.58% gap with 6.8M params
-    """
     
     def __init__(self, num_classes: int = 8, input_channels: int = 3, dropout: float = 0.3):
         """
