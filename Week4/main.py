@@ -11,7 +11,7 @@ import wandb
 from datetime import datetime
 
 from models import SimpleCNN, FlexibleCNN, OptimizedCNN, build_transforms
-from attention_models import CBAMOptimizedCNN
+from attention_models import CBAMOptimizedCNN, CBAMOptimizedCNNStudent
 from helpers import plot_metrics, save_training_summary, print_model_summary, save_model_architecture, plot_confusion_matrix, save_architecture_diagram
 from kl_loss import DistillationLoss
 from augmented_subset import AugmentedSubset
@@ -172,10 +172,6 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    # Build transforms
-
-    test_transform = build_transforms(train=False)
-    
     # Load datasets
     print(f"Loading datasets from {args.data_root}")
     base_train_dataset = ImageFolder(
@@ -286,6 +282,18 @@ def main(args):
             use_fc_hidden=args.use_fc_hidden,
             adaptive_pool_type=args.adaptive_pool_type
         )
+    elif args.model_type == "student":
+        model = CBAMOptimizedCNNStudent(
+            num_classes=num_classes,
+            input_channels=input_channels,
+            dropout=args.dropout,
+            reduction=args.cbam_reduction,
+            spatial_kernel=args.cbam_spatial_kernel,
+            spatial_dilation=args.cbam_dilation,
+            num_cbam_blocks=args.cbam_num_blocks,
+            width_scaling=0.25,
+        )
+
     else:
         raise ValueError(f"Unknown model type: {args.model_type}")
     
@@ -305,14 +313,22 @@ def main(args):
     teacher = None
     if args.use_distillation:
         print("\n[Distillation] Initializing teacher model...")
-    
-        # TODO: definir quins models poden ser teacher (ja posarem el que decidim)
         if args.teacher_model_type == "optimized":
-            pass
+            raise NotImplementedError()
         elif args.teacher_model_type == "se_optimized":
-            pass
+            raise NotImplementedError()
         elif args.teacher_model_type == "flexible":
-            pass
+            raise NotImplementedError()
+        elif args.teacher_model_type == "cbam_optimized":
+            teacher = CBAMOptimizedCNN(
+                num_classes=num_classes,
+                input_channels=input_channels,
+                dropout=args.dropout,
+                reduction=args.cbam_reduction,
+                spatial_kernel=args.cbam_spatial_kernel,
+                spatial_dilation=args.cbam_dilation,
+                num_cbam_blocks=args.cbam_num_blocks,
+            )
         else:
             raise ValueError("Unsupported teacher model")
         teacher.load_state_dict(
@@ -326,14 +342,14 @@ def main(args):
 
     # Define loss function
     if args.use_distillation:
-        criterion = DistillationLoss(
+        criterion_distillation = DistillationLoss(
             temperature=args.distill_temperature,
             alpha=args.distill_alpha
         )
         print(f"Loss function: DistillationLoss (T={args.distill_temperature}, α={args.distill_alpha})")
-    else:
-        criterion = nn.CrossEntropyLoss()
-        print(f"Loss function: CrossEntropyLoss")
+
+    criterion = nn.CrossEntropyLoss()
+    print(f"Loss function: CrossEntropyLoss")
     
     # Define optimizer
     print(f"\nSetting up optimizer: {args.optimizer}")
@@ -393,7 +409,7 @@ def main(args):
     
     for epoch in tqdm.tqdm(range(args.epochs), desc="Training"):
         # Train
-        train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device, teacher)
+        train_loss, train_acc = train_epoch(model, train_loader, criterion_distillation, optimizer, device, teacher)
         
         # Test
         test_loss, test_acc = test_epoch(model, test_loader, criterion, device)
@@ -602,7 +618,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_type",
         type=str,
-        choices=["optimized", "cbam_optimized", "simple", "flexible"],
+        choices=["optimized", "cbam_optimized", "simple", "flexible", "student"],
         default="optimized",
         help="Model architecture type: 'optimized' (default, post-experiment baseline), 'cbam_optimized' (with CBAM attention), 'simple' (original SimpleCNN), 'flexible' (configurable architecture)"
     )
@@ -689,8 +705,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--teacher_model_type",
         type=str,
-        choices=["optimized", "se_optimized", "flexible"],
-        default="se_optimized",
+        choices=["optimized", "se_optimized", "flexible", "cbam_optimized"],
+        default="cbam_optimized",
         help="Teacher model architecture"
     )
     parser.add_argument(

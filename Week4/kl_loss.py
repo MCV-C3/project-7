@@ -1,5 +1,7 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import random
 
 
 class DistillationLoss(nn.Module):
@@ -15,9 +17,8 @@ class DistillationLoss(nn.Module):
         ce_loss = self.ce(student_logits, labels)
 
         # Soft label loss
-        s_log_probs = F.log_softmax(student_logits / self.T, dim=1)
-        t_probs = F.softmax(teacher_logits / self.T, dim=1)
+        soft_targets = F.softmax(teacher_logits / self.T, dim=1)
+        soft_prob = F.log_softmax(student_logits / self.T, dim=1)
+        soft_targets_loss = torch.sum(soft_targets * (soft_targets.log() - soft_prob)) / soft_prob.size()[0] * (self.T**2)
 
-        kd_loss = self.kl(s_log_probs, t_probs) * (self.T ** 2)
-
-        return (1 - self.alpha) * ce_loss + self.alpha * kd_loss
+        return (1 - self.alpha) * ce_loss + self.alpha * soft_targets_loss
