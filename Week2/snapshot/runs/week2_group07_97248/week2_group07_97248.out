@@ -1,0 +1,23 @@
+Computational graph saved as computational_graph
+Epoch 0/20 - Train Loss: 11.3266, Train Accuracy: 0.1052, Test Loss: 2.5922, Test Accuracy: 0.1382
+Epoch 1/20 - Train Loss: 2.3527, Train Accuracy: 0.1507, Test Loss: 2.2512, Test Accuracy: 0.1695
+Epoch 2/20 - Train Loss: 2.2049, Train Accuracy: 0.2028, Test Loss: 2.2024, Test Accuracy: 0.1986
+Epoch 3/20 - Train Loss: 2.1788, Train Accuracy: 0.2180, Test Loss: 2.1747, Test Accuracy: 0.2118
+Epoch 4/20 - Train Loss: 2.1148, Train Accuracy: 0.2415, Test Loss: 2.1206, Test Accuracy: 0.2305
+Epoch 5/20 - Train Loss: 2.0814, Train Accuracy: 0.2561, Test Loss: 2.1791, Test Accuracy: 0.2227
+Epoch 6/20 - Train Loss: 2.0563, Train Accuracy: 0.2702, Test Loss: 2.1037, Test Accuracy: 0.2345
+Epoch 7/20 - Train Loss: 2.0202, Train Accuracy: 0.2862, Test Loss: 2.0912, Test Accuracy: 0.2459
+Epoch 8/20 - Train Loss: 2.0219, Train Accuracy: 0.2807, Test Loss: 2.0654, Test Accuracy: 0.2582
+Epoch 9/20 - Train Loss: 1.9930, Train Accuracy: 0.2984, Test Loss: 2.0988, Test Accuracy: 0.2550
+Epoch 10/20 - Train Loss: 1.9763, Train Accuracy: 0.2969, Test Loss: 2.1344, Test Accuracy: 0.2427
+Epoch 11/20 - Train Loss: 1.9838, Train Accuracy: 0.3007, Test Loss: 2.0876, Test Accuracy: 0.2627
+Epoch 12/20 - Train Loss: 1.9486, Train Accuracy: 0.3146, Test Loss: 2.0942, Test Accuracy: 0.2291
+Epoch 13/20 - Train Loss: 1.9561, Train Accuracy: 0.3072, Test Loss: 2.0904, Test Accuracy: 0.2582
+Epoch 14/20 - Train Loss: 1.9205, Train Accuracy: 0.3287, Test Loss: 2.1209, Test Accuracy: 0.2500
+Epoch 15/20 - Train Loss: 1.9241, Train Accuracy: 0.3197, Test Loss: 2.1223, Test Accuracy: 0.2391
+Epoch 16/20 - Train Loss: 1.9332, Train Accuracy: 0.3191, Test Loss: 2.0791, Test Accuracy: 0.2655
+Epoch 17/20 - Train Loss: 1.8819, Train Accuracy: 0.3398, Test Loss: 2.1175, Test Accuracy: 0.2650
+Epoch 18/20 - Train Loss: 1.8999, Train Accuracy: 0.3276, Test Loss: 2.0888, Test Accuracy: 0.2545
+Epoch 19/20 - Train Loss: 1.8491, Train Accuracy: 0.3572, Test Loss: 2.1138, Test Accuracy: 0.2455
+Plot saved as loss.png
+Plot saved as metrics.png

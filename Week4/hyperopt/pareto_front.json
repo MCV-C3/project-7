@@ -1,0 +1,73 @@
+[
+  {
+    "trial_number": 5,
+    "test_accuracy": 0.729458041958042,
+    "overfitting": 0.0004580419580419992,
+    "hyperparameters": {
+      "batch_size": 32,
+      "epochs": 40,
+      "optimizer": "Adam",
+      "learning_rate": 9.278723835524691e-05,
+      "weight_decay": 2.2264204303769678e-05,
+      "dropout": 0.5452413703502375,
+      "max_grad_norm": 0.0
+    }
+  },
+  {
+    "trial_number": 6,
+    "test_accuracy": 0.8304195804195804,
+    "overfitting": 0.047580419580419586,
+    "hyperparameters": {
+      "batch_size": 16,
+      "epochs": 50,
+      "optimizer": "AdamW",
+      "learning_rate": 0.0011306704080979888,
+      "weight_decay": 0.00048287152161792117,
+      "dropout": 0.5083868719818243,
+      "max_grad_norm": 0.5
+    }
+  },
+  {
+    "trial_number": 13,
+    "test_accuracy": 0.15166083916083917,
+    "overfitting": 0.0003391608391608292,
+    "hyperparameters": {
+      "batch_size": 32,
+      "epochs": 50,
+      "optimizer": "SGD",
+      "learning_rate": 0.0004712254618631357,
+      "weight_decay": 3.30896229386488e-05,
+      "dropout": 0.21322818490647694,
+      "max_grad_norm": 0.0,
+      "momentum": 0.005312148597403921
+    }
+  },
+  {
+    "trial_number": 24,
+    "test_accuracy": 0.7972027972027972,
+    "overfitting": 0.0067972027972028615,
+    "hyperparameters": {
+      "batch_size": 16,
+      "epochs": 40,
+      "optimizer": "AdamW",
+      "learning_rate": 0.004724895255851464,
+      "weight_decay": 4.3811084094134425e-05,
+      "dropout": 0.5595005388973355,
+      "max_grad_norm": 0.0
+    }
+  },
+  {
+    "trial_number": 43,
+    "test_accuracy": 0.8142482517482518,
+    "overfitting": 0.011248251748251725,
+    "hyperparameters": {
+      "batch_size": 8,
+      "epochs": 40,
+      "optimizer": "Adam",
+      "learning_rate": 0.004466472368667229,
+      "weight_decay": 2.2425992974556244e-05,
+      "dropout": 0.333988417374367,
+      "max_grad_norm": 0.0
+    }
+  }
+]

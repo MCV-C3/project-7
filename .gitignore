@@ -1,0 +1,20 @@
+# Ignore output and wandb in all Week folders
+Week*/output/
+Week*/wandb/
+
+# EXCEPT keep Week4's folders
+# !Week4/output/
+# !Week4/wandb/
+
+SE_ATTENTION_MECHANISM.md
+
+# Ignore output and wandb at root level if any
+/output/
+/wandb/
+
+data/
+/.venv
+**/__pycache__/
+Week*/**/__pycache__/
+*.pyc
+.DS_Store

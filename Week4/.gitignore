@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyTorch models (but keep them in output folder for now)
+# *.pth
+# *.pt
+
+# Wandb (keep for Week4)
+# wandb/
+*.wandb
+
+# Output files (keep output folder but ignore images)
+# output/
+# *.png
+# *.jpg
+# *.jpeg
+
+# Logs
+*.log
+*.out
+*.err
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data (if accidentally copied here)
+data/
+MIT_split/

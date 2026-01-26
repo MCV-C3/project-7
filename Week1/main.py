@@ -1,120 +1,107 @@
-from bovw import BOVW
-
-from typing import *
-from PIL import Image
-
 import numpy as np
-import glob
-import tqdm
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold, StratifiedKFold
+from bovw import BOVW
+from utils import load_dataset, extract_descriptors, extract_bovw_histograms
 import os
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-
-
-
-
-def extract_bovw_histograms(bovw: Type[BOVW], descriptors: Literal["N", "T", "d"]):
-    return np.array([bovw._compute_codebook_descriptor(descriptors=descriptor, kmeans=bovw.codebook_algo) for descriptor in descriptors])
-
-
-def test(dataset: List[Tuple[Type[Image.Image], int]]
-         , bovw: Type[BOVW], 
-         classifier:Type[object]):
+def train_evaluate(train_hist, train_labels, val_hist, val_labels, classifier_type="logreg", **kwargs):
+    if classifier_type == "logreg":
+        clf = LogisticRegression(class_weight="balanced", **kwargs)
+    elif classifier_type == "svm_linear":
+        clf = SVC(kernel="linear", **kwargs)
+    elif classifier_type == "svm_rbf":
+        clf = SVC(kernel="rbf", **kwargs)
+    else:
+        raise ValueError(f"Unknown classifier: {classifier_type}")
     
-    test_descriptors = []
-    descriptors_labels = []
+    clf.fit(train_hist, train_labels)
+    train_acc = accuracy_score(train_labels, clf.predict(train_hist))
+    val_acc = accuracy_score(val_labels, clf.predict(val_hist))
     
-    for idx in tqdm.tqdm(range(len(dataset)), desc="Phase [Eval]: Extracting the descriptors"):
-        image, label = dataset[idx]
-        _, descriptors = bovw._extract_features(image=np.array(image))
+    return train_acc, val_acc, clf
+
+def cross_validate(dataset, bovw_params, classifier_params, n_splits=5, classifier_type="logreg"):
+    # Extraer labels para el split estratificado
+    labels = [label for _, label in dataset]
+
+    kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+    fold_results = []
+    for fold_idx, (train_idx, val_idx) in enumerate(kf.split(dataset, labels)):
+        print(f"\nFold {fold_idx + 1}/{n_splits}")
         
-        if descriptors is not None:
-            test_descriptors.append(descriptors)
-            descriptors_labels.append(label)
-            
-    
-    print("Computing the bovw histograms")
-    bovw_histograms = extract_bovw_histograms(descriptors=test_descriptors, bovw=bovw)
-    
-    print("predicting the values")
-    y_pred = classifier.predict(bovw_histograms)
-    
-    print("Accuracy on Phase[Test]:", accuracy_score(y_true=descriptors_labels, y_pred=y_pred))
-    
-
-def train(dataset: List[Tuple[Type[Image.Image], int]],
-           bovw:Type[BOVW]):
-    all_descriptors = []
-    all_labels = []
-    
-    for idx in tqdm.tqdm(range(len(dataset)), desc="Phase [Training]: Extracting the descriptors"):
+        train_set = [dataset[i] for i in train_idx]
+        val_set = [dataset[i] for i in val_idx]
         
-        image, label = dataset[idx]
-        _, descriptors = bovw._extract_features(image=np.array(image))
+        bovw = BOVW(**bovw_params)
+        train_desc, train_labels = extract_descriptors(bovw, train_set, "Extracting train descriptors")
         
-        if descriptors  is not None:
-            all_descriptors.append(descriptors)
-            all_labels.append(label)
-            
-    print("Fitting the codebook")
-    kmeans, cluster_centers = bovw._update_fit_codebook(descriptors=all_descriptors)
-
-    print("Computing the bovw histograms")
-    bovw_histograms = extract_bovw_histograms(descriptors=all_descriptors, bovw=bovw) 
+        bovw._update_fit_codebook(train_desc)
+        train_hist = extract_bovw_histograms(bovw, train_desc, fit_pca=True)
+        
+        val_desc, val_labels = extract_descriptors(bovw, val_set, "Extracting val descriptors")
+        val_hist = extract_bovw_histograms(bovw, val_desc, fit_pca=False)
+        
+        train_acc, val_acc, _ = train_evaluate(train_hist, train_labels, 
+                                               val_hist, val_labels, 
+                                               classifier_type, **classifier_params)
+        
+        fold_results.append({"train": train_acc, "val": val_acc})
+        print(f"Train: {train_acc:.4f}, Val: {val_acc:.4f}")
     
-    print("Fitting the classifier")
-    classifier = LogisticRegression(class_weight="balanced").fit(bovw_histograms, all_labels)
-
-    print("Accuracy on Phase[Train]:", accuracy_score(y_true=all_labels, y_pred=classifier.predict(bovw_histograms)))
+    mean_val = np.mean([r["val"] for r in fold_results])
+    std_val = np.std([r["val"] for r in fold_results])
     
-    return bovw, classifier
+    return mean_val, std_val
 
-
-def Dataset(ImageFolder:str = "data/MIT_split/train") -> List[Tuple[Type[Image.Image], int]]:
-
-    """
-    Expected Structure:
-
-        ImageFolder/<cls label>/xxx1.png
-        ImageFolder/<cls label>/xxx2.png
-        ImageFolder/<cls label>/xxx3.png
-        ...
-
-        Example:
-            ImageFolder/cat/123.png
-            ImageFolder/cat/nsdf3.png
-            ImageFolder/cat/[...]/asd932_.png
+def test_final(train_set, test_set, bovw_params, classifier_params, classifier_type="logreg"):
+    bovw = BOVW(**bovw_params)
+    train_desc, train_labels = extract_descriptors(bovw, train_set, "Extracting train descriptors")
     
-    """
-
-    map_classes = {clsi: idx for idx, clsi  in enumerate(os.listdir(ImageFolder))}
+    bovw._update_fit_codebook(train_desc)
+    train_hist = extract_bovw_histograms(bovw, train_desc, fit_pca=True)
     
-    dataset :List[Tuple] = []
-
-    for idx, cls_folder in enumerate(os.listdir(ImageFolder)):
-
-        image_path = os.path.join(ImageFolder, cls_folder)
-        images: List[str] = glob.glob(image_path+"/*.jpg")
-        for img in images:
-            img_pil = Image.open(img).convert("RGB")
-
-            dataset.append((img_pil, map_classes[cls_folder]))
-
-
-    return dataset
-
-
+    test_desc, test_labels = extract_descriptors(bovw, test_set, "Extracting test descriptors")
+    test_hist = extract_bovw_histograms(bovw, test_desc, fit_pca=False)
     
-
+    train_acc, test_acc, clf = train_evaluate(train_hist, train_labels,
+                                              test_hist, test_labels,
+                                              classifier_type, **classifier_params)
+    
+    return train_acc, test_acc, bovw, clf
 
 if __name__ == "__main__":
-     #/home/cboned/data/Master/MIT_split
-    data_train = Dataset(ImageFolder="/home/cboned/data/Master/MIT_split/train")
-    data_test = Dataset(ImageFolder="/home/cboned/data/Master/MIT_split/test") 
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATA_DIR = os.path.join(BASE_DIR, "..", "data", "MIT_split")
 
-    bovw = BOVW()
-    
-    bovw, classifier = train(dataset=data_train, bovw=bovw)
-    
-    test(dataset=data_test, bovw=bovw, classifier=classifier)
+    train_data = load_dataset(os.path.join(DATA_DIR, "train"))
+    test_data  = load_dataset(os.path.join(DATA_DIR, "test"))
+    classifier_type = 'logreg'
+
+    print(f"Train samples: {len(train_data)}, Test samples: {len(test_data)}")
+
+    bovw_params = {
+        "detector_type": "SIFT",
+        "codebook_size": 200,
+        "dense_sift": True,
+        "sift_step": 10,
+        "sift_scales": 2,
+        "pca_components": 0.90, # Can specify number of components (int) or retained variance (float)
+    }
+
+    classifier_params = {}
+
+    print("\n=== Cross-Validation ===")
+    print(f"\n=== CLASSIFIER : {classifier_type} ===")
+    mean_acc, std_acc = cross_validate(train_data, bovw_params, classifier_params,
+                                       n_splits=5, classifier_type=classifier_type)
+    print(f"\nMean CV Accuracy: {mean_acc:.4f} +/- {std_acc:.4f}")
+
+    print("\n=== Final Test ===")
+    train_acc, test_acc, bovw, clf = test_final(train_data, test_data,
+                                                bovw_params, classifier_params,
+                                                classifier_type=classifier_type)
+    print(f"Train Accuracy: {train_acc:.4f}")
+    print(f"Test Accuracy: {test_acc:.4f}")

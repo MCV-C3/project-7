@@ -1,0 +1,44 @@
+Computational graph saved as computational_graph
+Epoch 0/40 - Train Loss: 2.3474, Train Accuracy: 0.1351, Test Loss: 2.2602, Test Accuracy: 0.1732
+Epoch 1/40 - Train Loss: 2.2203, Train Accuracy: 0.1880, Test Loss: 2.1715, Test Accuracy: 0.1986
+Epoch 2/40 - Train Loss: 2.1556, Train Accuracy: 0.2155, Test Loss: 2.1226, Test Accuracy: 0.2159
+Epoch 3/40 - Train Loss: 2.1260, Train Accuracy: 0.2225, Test Loss: 2.1174, Test Accuracy: 0.2218
+Epoch 4/40 - Train Loss: 2.1003, Train Accuracy: 0.2382, Test Loss: 2.0863, Test Accuracy: 0.2377
+Epoch 5/40 - Train Loss: 2.0756, Train Accuracy: 0.2433, Test Loss: 2.0782, Test Accuracy: 0.2395
+Epoch 6/40 - Train Loss: 2.0484, Train Accuracy: 0.2594, Test Loss: 2.0782, Test Accuracy: 0.2309
+Epoch 7/40 - Train Loss: 2.0435, Train Accuracy: 0.2610, Test Loss: 2.0755, Test Accuracy: 0.2450
+Epoch 8/40 - Train Loss: 2.0364, Train Accuracy: 0.2641, Test Loss: 2.0551, Test Accuracy: 0.2414
+Epoch 9/40 - Train Loss: 2.0020, Train Accuracy: 0.2803, Test Loss: 2.0313, Test Accuracy: 0.2505
+Epoch 10/40 - Train Loss: 1.9975, Train Accuracy: 0.2761, Test Loss: 2.0688, Test Accuracy: 0.2427
+Epoch 11/40 - Train Loss: 1.9781, Train Accuracy: 0.2852, Test Loss: 2.0693, Test Accuracy: 0.2595
+Epoch 12/40 - Train Loss: 1.9749, Train Accuracy: 0.2902, Test Loss: 2.0466, Test Accuracy: 0.2645
+Epoch 13/40 - Train Loss: 1.9677, Train Accuracy: 0.2892, Test Loss: 2.0828, Test Accuracy: 0.2382
+Epoch 14/40 - Train Loss: 1.9620, Train Accuracy: 0.2932, Test Loss: 2.0476, Test Accuracy: 0.2659
+Epoch 15/40 - Train Loss: 1.9487, Train Accuracy: 0.2984, Test Loss: 2.0797, Test Accuracy: 0.2418
+Epoch 16/40 - Train Loss: 1.9130, Train Accuracy: 0.3136, Test Loss: 2.0640, Test Accuracy: 0.2695
+Epoch 17/40 - Train Loss: 1.9224, Train Accuracy: 0.3147, Test Loss: 2.0514, Test Accuracy: 0.2714
+Epoch 18/40 - Train Loss: 1.9073, Train Accuracy: 0.3190, Test Loss: 2.0980, Test Accuracy: 0.2614
+Epoch 19/40 - Train Loss: 1.8922, Train Accuracy: 0.3199, Test Loss: 2.0690, Test Accuracy: 0.2655
+Epoch 20/40 - Train Loss: 1.8770, Train Accuracy: 0.3292, Test Loss: 2.0516, Test Accuracy: 0.2691
+Epoch 21/40 - Train Loss: 1.8621, Train Accuracy: 0.3391, Test Loss: 2.0778, Test Accuracy: 0.2495
+Epoch 22/40 - Train Loss: 1.8746, Train Accuracy: 0.3279, Test Loss: 2.0319, Test Accuracy: 0.2786
+Epoch 23/40 - Train Loss: 1.8358, Train Accuracy: 0.3460, Test Loss: 2.0880, Test Accuracy: 0.2664
+Epoch 24/40 - Train Loss: 1.8070, Train Accuracy: 0.3537, Test Loss: 2.0537, Test Accuracy: 0.2727
+Epoch 25/40 - Train Loss: 1.7782, Train Accuracy: 0.3656, Test Loss: 2.0962, Test Accuracy: 0.2664
+Epoch 26/40 - Train Loss: 1.7938, Train Accuracy: 0.3563, Test Loss: 2.1092, Test Accuracy: 0.2536
+Epoch 27/40 - Train Loss: 1.7727, Train Accuracy: 0.3546, Test Loss: 2.1529, Test Accuracy: 0.2718
+Epoch 28/40 - Train Loss: 1.7470, Train Accuracy: 0.3752, Test Loss: 2.1510, Test Accuracy: 0.2673
+Epoch 29/40 - Train Loss: 1.7166, Train Accuracy: 0.3876, Test Loss: 2.1238, Test Accuracy: 0.2632
+Epoch 30/40 - Train Loss: 1.7009, Train Accuracy: 0.3953, Test Loss: 2.1544, Test Accuracy: 0.2823
+Epoch 31/40 - Train Loss: 1.6828, Train Accuracy: 0.4002, Test Loss: 2.1731, Test Accuracy: 0.2632
+Epoch 32/40 - Train Loss: 1.6638, Train Accuracy: 0.4057, Test Loss: 2.2195, Test Accuracy: 0.2700
+Epoch 33/40 - Train Loss: 1.6485, Train Accuracy: 0.4120, Test Loss: 2.2896, Test Accuracy: 0.2545
+Epoch 34/40 - Train Loss: 1.6365, Train Accuracy: 0.4145, Test Loss: 2.2675, Test Accuracy: 0.2627
+Epoch 35/40 - Train Loss: 1.5747, Train Accuracy: 0.4360, Test Loss: 2.2972, Test Accuracy: 0.2791
+Epoch 36/40 - Train Loss: 1.5522, Train Accuracy: 0.4417, Test Loss: 2.3091, Test Accuracy: 0.2650
+Epoch 37/40 - Train Loss: 1.5243, Train Accuracy: 0.4568, Test Loss: 2.3571, Test Accuracy: 0.2759
+Epoch 38/40 - Train Loss: 1.5362, Train Accuracy: 0.4501, Test Loss: 2.4079, Test Accuracy: 0.2477
+Epoch 39/40 - Train Loss: 1.4821, Train Accuracy: 0.4657, Test Loss: 2.4066, Test Accuracy: 0.2668
+Plot saved as loss.png
+Plot saved as metrics.png
+Tabla de aciertos guardada en: /export/home/group07/week2/runs/week2_group07_97910/tabla_aciertos.png
